@@ -1,0 +1,103 @@
+<?php
+/**
+ * /api/stock_movements.php
+ * Records stock-in / stock-out movements against dbo.ims_inventory and
+ * logs each one to dbo.ims_stock_movements, so quantity changes always
+ * leave an auditable trail instead of being silently overwritten.
+ *
+ * POST /api/stock_movements.php
+ *   { sku_id, movement_type: 'in'|'out', quantity, reference_code?, notes? }
+ */
+
+header('Content-Type: application/json; charset=utf-8');
+
+require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../connection/db.php';
+require_once __DIR__ . '/../auth/rbac.php';
+require_once __DIR__ . '/../utils/api.php';
+
+require_login();
+require_permission('Inventory', 'edit');
+
+$method = $_SERVER['REQUEST_METHOD'];
+$db = get_db();
+
+if ($method !== 'POST') {
+    json_error('Method not allowed', 405);
+}
+
+$data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+$sku_id = (int)($data['sku_id'] ?? 0);
+$movement_type = $data['movement_type'] ?? '';
+$quantity = (int)($data['quantity'] ?? 0);
+$reference_code = trim($data['reference_code'] ?? '');
+$notes = trim($data['notes'] ?? '');
+
+if (!$sku_id || !in_array($movement_type, ['in', 'out'], true) || $quantity <= 0) {
+    json_error('sku_id, a valid movement_type (in/out), and a positive quantity are required', 400);
+}
+
+$user = logged_in_user();
+
+try {
+    $db->beginTransaction();
+
+    $stmt = $db->prepare('SELECT * FROM dbo.ims_inventory WHERE sku_id = ?');
+    $stmt->bindValue(1, $sku_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $item = $stmt->fetch();
+
+    if (!$item) {
+        $db->rollBack();
+        json_error('Item not found', 404);
+    }
+
+    if ($item['status'] === 'archived') {
+        $db->rollBack();
+        json_error('Cannot record movement: item is archived. Restore it first.', 409);
+    }
+
+    if ($movement_type === 'out' && $quantity > (int)$item['quantity_on_hand']) {
+        $db->rollBack();
+        json_error('Not enough stock on hand: only ' . $item['quantity_on_hand'] . ' available', 409);
+    }
+
+    $delta = $movement_type === 'in' ? $quantity : -$quantity;
+
+    $update = $db->prepare('
+        UPDATE dbo.ims_inventory
+        SET quantity_on_hand = quantity_on_hand + ?, updated_at = GETUTCDATE()
+        WHERE sku_id = ?
+    ');
+    $update->bindValue(1, $delta, PDO::PARAM_INT);
+    $update->bindValue(2, $sku_id, PDO::PARAM_INT);
+    $update->execute();
+
+    $insert = $db->prepare('
+        INSERT INTO dbo.ims_stock_movements (sku_id, user_id, movement_type, quantity, reference_code, notes)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ');
+    $insert->bindValue(1, $sku_id, PDO::PARAM_INT);
+    $insert->bindValue(2, (int)$user['id'], PDO::PARAM_INT);
+    $insert->bindValue(3, $movement_type);
+    $insert->bindValue(4, $quantity, PDO::PARAM_INT);
+    $insert->bindValue(5, $reference_code !== '' ? $reference_code : null);
+    $insert->bindValue(6, $notes !== '' ? $notes : null);
+    $insert->execute();
+
+    $db->commit();
+
+    $updated = $db->prepare('SELECT * FROM dbo.ims_inventory WHERE sku_id = ?');
+    $updated->bindValue(1, $sku_id, PDO::PARAM_INT);
+    $updated->execute();
+
+    json_success($updated->fetch(), 'Stock movement recorded successfully', 201);
+
+} catch (Exception $e) {
+    if ($db->inTransaction()) {
+        $db->rollBack();
+    }
+    error_log('Stock movement API error: ' . $e->getMessage());
+    json_error('Server error', 500);
+}

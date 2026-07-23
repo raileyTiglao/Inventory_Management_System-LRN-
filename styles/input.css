@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-base text-ink font-body antialiased;
+  }
+  ::selection {
+    @apply bg-tag-amber/30 text-ink;
+  }
+}
+
+@layer components {
+  /* Signature element: the "bin tag" card — a stock/inventory tag with a
+     notched top-left corner and a perforated amber stripe, echoing the
+     torn tags clipped to warehouse bins. Used for stat cards, table
+     headers, and section labels throughout the IMS. */
+  .bin-tag {
+    @apply relative bg-card border border-border rounded-tag overflow-hidden;
+  }
+  .bin-tag::before {
+    content: "";
+    @apply absolute top-0 left-0 right-0 h-[3px] bg-perf-h;
+  }
+  .bin-tag-notch {
+    clip-path: polygon(0 12px, 12px 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .eyebrow {
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-ink-dim;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-tag text-sm text-ink-muted hover:bg-white/5 hover:text-ink transition-colors;
+  }
+  .sidebar-link.active {
+    @apply bg-tag-amber/10 text-tag-amber border border-tag-amber/30;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-tag-amber text-base-deep font-semibold text-sm px-4 py-2.5 rounded-tag hover:bg-tag-amberdark transition-colors;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 bg-transparent border border-border-light text-ink text-sm px-4 py-2.5 rounded-tag hover:border-tag-amber/50 hover:text-tag-amber transition-colors;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 bg-transparent border border-stock-out/40 text-stock-out text-sm px-4 py-2.5 rounded-tag hover:bg-stock-out/10 transition-colors;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wide px-2 py-1 rounded-tag border;
+  }
+  .badge-amber { @apply badge bg-tag-amber/10 text-tag-amber border-tag-amber/30; }
+  .badge-green { @apply badge bg-stock-in/10 text-stock-in border-stock-in/30; }
+  .badge-red { @apply badge bg-stock-out/10 text-stock-out border-stock-out/30; }
+  .badge-muted { @apply badge bg-white/5 text-ink-muted border-border-light; }
+
+  .field-label {
+    @apply block text-xs font-mono uppercase tracking-wide text-ink-dim mb-1.5;
+  }
+  .field-input {
+    @apply w-full bg-base-deep border border-border rounded-tag px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-dim focus:outline-none focus:border-tag-amber/60 focus:ring-1 focus:ring-tag-amber/40 transition-colors;
+  }
+
+  .data-table {
+    @apply w-full text-sm;
+  }
+  /* No default text-align here — it must come from an explicit .text-left/
+     .text-right/.text-center utility on each <th>, or its higher-specificity
+     `thead th` selector silently wins over those utilities regardless of
+     source order, which is what caused header/data column misalignment. */
+  .data-table thead th {
+    @apply font-mono text-[11px] uppercase tracking-wider text-ink-dim border-b border-border py-3 px-4;
+  }
+  .data-table tbody td {
+    @apply py-3.5 px-4 border-b border-border/60 text-ink-muted;
+  }
+  .data-table tbody tr:hover td {
+    @apply bg-white/[0.02] text-ink;
+  }
+
+  /* Header/footer strip used inside bin-tag panels and modals */
+  .panel-header {
+    @apply flex items-center justify-between px-5 py-4 border-b border-border;
+  }
+  .panel-footer {
+    @apply flex items-center justify-between px-5 py-3.5 border-t border-border;
+  }
+
+  /* Stat summary card — pairs with .bin-tag on the same element */
+  .stat-card {
+    @apply bin-tag-notch p-4;
+  }
+  .stat-code {
+    @apply font-mono text-[10px] text-ink-dim tracking-widest;
+  }
+  .stat-value {
+    @apply font-display text-2xl font-semibold text-ink mt-3;
+  }
+  .stat-label {
+    @apply text-xs text-ink-muted mt-1;
+  }
+
+  /* Icon-only action buttons (table row actions, modal close) */
+  .icon-btn {
+    @apply w-8 h-8 flex items-center justify-center rounded-tag text-ink-muted transition-colors;
+  }
+  .icon-btn-amber { @apply icon-btn hover:bg-white/5 hover:text-tag-amber; }
+  .icon-btn-danger { @apply icon-btn hover:bg-stock-out/10 hover:text-stock-out; }
+  .icon-btn-success { @apply icon-btn hover:bg-stock-in/10 hover:text-stock-in; }
+  .icon-btn-muted { @apply icon-btn hover:bg-white/5 hover:text-ink; }
+
+  /* Table pagination controls */
+  .pagination-btn {
+    @apply w-8 h-8 flex items-center justify-center rounded-tag border border-border text-ink-dim disabled:opacity-40;
+  }
+  .pagination-btn-active {
+    @apply w-8 h-8 flex items-center justify-center rounded-tag bg-tag-amber/10 border border-tag-amber/30 text-tag-amber font-mono text-xs;
+  }
+  .pagination-page {
+    @apply font-mono text-xs text-ink-muted px-2;
+  }
+
+  /* Toolbar search field */
+  .search-wrap {
+    @apply relative;
+  }
+  .search-icon {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 text-ink-dim;
+  }
+  .search-input {
+    @apply field-input !py-2 !pl-9 text-xs;
+  }
+
+  /* Modal chrome — .modal-panel pairs with .bin-tag on the same element.
+     `hidden` is intentionally NOT baked in here: it must stay a separate
+     literal utility class on the element so JS can toggle it and Tailwind's
+     utilities-layer ordering makes it win over this rule's `flex`. */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4;
+  }
+  .modal-panel {
+    @apply w-full max-w-lg;
+  }
+  .modal-panel-sm {
+    @apply w-full max-w-md;
+  }
+  .modal-footer {
+    @apply flex items-center justify-end gap-3 pt-2;
+  }
+}
