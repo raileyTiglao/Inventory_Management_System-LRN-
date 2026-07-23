@@ -1,1 +1,7 @@
 node_modules/
+
+# Local test/debug scratch files
+test*.php
+Test*.php
+debug.log
+*.log
