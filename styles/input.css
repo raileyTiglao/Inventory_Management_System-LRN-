@@ -102,7 +102,7 @@
     @apply inline-flex items-center justify-center gap-2 bg-transparent border border-border-light text-ink text-sm px-4 py-2.5 rounded-tag hover:border-tag-amber/50 hover:text-tag-amber transition-colors;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 bg-transparent border border-stock-out/40 text-stock-out text-sm px-4 py-2.5 rounded-tag hover:bg-stock-out/10 transition-colors;
+    @apply inline-flex items-center justify-center gap-2 bg-transparent border border-stock-out text-stock-out text-sm px-4 py-2.5 rounded-tag hover:bg-stock-out/10 transition-colors;
   }
 
   .badge {
@@ -177,6 +177,53 @@
   }
   .pagination-page {
     @apply font-mono text-xs text-ink-muted px-2;
+  }
+
+  /* Role cards prev/next arrows — hover/press feedback on top of .pagination-btn. */
+  .role-cards-nav {
+    transition-property: color, background-color, border-color, transform;
+    transition-duration: 150ms;
+    transition-timing-function: ease-in-out;
+  }
+  .role-cards-nav:hover:not(:disabled) {
+    @apply text-tag-amber;
+    border-color: rgba(232, 163, 61, 0.5);
+    transform: scale(1.08);
+  }
+  .role-cards-nav:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  /* Login page ambient backdrop — blueprint grid + soft amber glow, echoing
+     the bin-tag warehouse motif without competing with the card. */
+  .login-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(232, 163, 61, 0.10), transparent 42%),
+      radial-gradient(circle at 88% 82%, rgba(232, 163, 61, 0.07), transparent 45%),
+      repeating-linear-gradient(0deg, rgba(232, 163, 61, 0.05) 0, rgba(232, 163, 61, 0.05) 1px, transparent 1px, transparent 48px),
+      repeating-linear-gradient(90deg, rgba(232, 163, 61, 0.05) 0, rgba(232, 163, 61, 0.05) 1px, transparent 1px, transparent 48px);
+  }
+  .login-watermark {
+    position: absolute;
+    z-index: 0;
+    color: rgba(232, 163, 61, 0.06);
+    pointer-events: none;
+  }
+  .login-watermark-tl {
+    top: -4rem;
+    left: -4rem;
+  }
+  .login-watermark-br {
+    bottom: -4rem;
+    right: -4rem;
+  }
+  .login-watermark-icon {
+    width: 280px;
+    height: 280px;
   }
 
   /* Toolbar search field */

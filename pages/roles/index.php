@@ -38,8 +38,12 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
     </div>
 
     <!-- Role cards -->
-    <div id="role-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <p class="text-sm text-ink-dim col-span-full py-8 text-center">Loading roles…</p>
+    <div class="flex items-center gap-3">
+      <button type="button" id="role-cards-prev" onclick="scrollRoleCards(-1)" class="pagination-btn role-cards-nav shrink-0" disabled>‹</button>
+      <div id="role-cards" class="flex gap-4 overflow-x-hidden flex-1">
+        <p class="text-sm text-ink-dim py-8 text-center">Loading roles…</p>
+      </div>
+      <button type="button" id="role-cards-next" onclick="scrollRoleCards(1)" class="pagination-btn role-cards-nav shrink-0" disabled>›</button>
     </div>
 
     <!-- Permission matrix -->
@@ -153,7 +157,8 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
     const container = document.getElementById('role-cards');
 
     if (roles.length === 0) {
-      container.innerHTML = '<p class="text-sm text-ink-dim col-span-full py-8 text-center">No roles yet.</p>';
+      container.innerHTML = '<p class="text-sm text-ink-dim py-8 text-center">No roles yet.</p>';
+      updateRoleCardsNav();
       return;
     }
 
@@ -162,7 +167,7 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
       const canDeleteThis = CAN_DELETE && userCount === 0;
 
       return `
-        <div class="bin-tag stat-card">
+        <div class="bin-tag stat-card w-64 shrink-0">
           <div class="flex items-start justify-between">
             <p class="stat-code">${roleCode(r.role_id)}</p>
             <div class="flex items-center gap-1">
@@ -178,6 +183,22 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
           </div>
         </div>`;
     }).join('');
+
+    updateRoleCardsNav();
+  }
+
+  function updateRoleCardsNav() {
+    const el = document.getElementById('role-cards');
+    const prev = document.getElementById('role-cards-prev');
+    const next = document.getElementById('role-cards-next');
+    prev.disabled = el.scrollLeft <= 0;
+    next.disabled = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+  }
+
+  function scrollRoleCards(direction) {
+    const el = document.getElementById('role-cards');
+    el.scrollBy({ left: direction * 288, behavior: 'smooth' });
+    setTimeout(updateRoleCardsNav, 300);
   }
 
   function iconShield() {

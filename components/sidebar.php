@@ -93,12 +93,31 @@ if (has_permission('Inventory', 'view')) {
   </nav>
 
   <div class="p-3 border-t border-border">
-    <a href="<?= BASE_URL ?>/auth/logout.php" class="sidebar-link text-stock-out/80 hover:text-stock-out hover:bg-stock-out/10">
+    <button type="button" onclick="openSignOutModal()" class="sidebar-link text-stock-out/80 hover:text-stock-out hover:bg-stock-out/10 w-full text-left">
       <?= icon('logout', 'w-[18px] h-[18px] shrink-0') ?>
       <span class="sidebar-label">Sign out</span>
-    </a>
+    </button>
   </div>
 </aside>
+
+<div id="signout-modal" class="hidden flex modal-overlay">
+  <div class="bin-tag modal-panel-sm">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Session</p>
+        <h2 class="font-display font-semibold text-ink">Sign out?</h2>
+      </div>
+      <button type="button" onclick="closeSignOutModal()" class="icon-btn-muted">✕</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <p class="text-sm text-ink-muted">You'll need to sign in again to access the system.</p>
+      <div class="modal-footer">
+        <button type="button" onclick="closeSignOutModal()" class="btn-secondary">Cancel</button>
+        <a href="<?= BASE_URL ?>/auth/logout.php" class="btn-danger">Sign out</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 (function () {
@@ -136,4 +155,11 @@ if (has_permission('Inventory', 'view')) {
     noResults.classList.toggle('hidden', anyGroupVisible || !q);
   });
 })();
+
+function openSignOutModal() {
+  document.getElementById('signout-modal').classList.remove('hidden');
+}
+function closeSignOutModal() {
+  document.getElementById('signout-modal').classList.add('hidden');
+}
 </script>

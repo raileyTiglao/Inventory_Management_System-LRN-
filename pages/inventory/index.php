@@ -307,7 +307,6 @@ $canDelete = has_permission('Inventory', 'delete');
         document.getElementById('item-reorder_level').value = item.reorder_level;
         document.getElementById('item-unit_cost').value = item.unit_cost ?? '';
         document.getElementById('item-sku_code-display').textContent = item.sku_code;
-        document.getElementById('item-quantity_on_hand-display').textContent = item.quantity_on_hand;
       }
 
       skuField.classList.add('hidden');

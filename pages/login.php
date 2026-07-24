@@ -9,11 +9,20 @@ $pageTitle = 'Sign In';
 </head>
 <body class="min-h-screen flex items-center justify-center bg-base p-4 relative overflow-hidden">
 
-  <!-- ambient perforation stripes, echoing the bin-tag signature -->
-  <div class="absolute inset-x-0 top-0 h-1 bg-perf-h"></div>
+  <!-- ambient decorative backdrop: blueprint grid, amber glow, and oversized
+       watermark icons echoing the bin-tag warehouse motif -->
+  <div class="login-backdrop" aria-hidden="true"></div>
+  <div class="login-watermark login-watermark-tl" aria-hidden="true">
+    <?= icon('package', 'login-watermark-icon') ?>
+  </div>
+  <div class="login-watermark login-watermark-br" aria-hidden="true">
+    <?= icon('grid', 'login-watermark-icon') ?>
+  </div>
+
+  <!-- ambient perforation stripe, echoing the bin-tag signature -->
   <div class="absolute inset-x-0 bottom-0 h-1 bg-perf-h"></div>
 
-  <div class="w-full max-w-md">
+  <div class="w-full max-w-md relative z-10">
     <div class="flex items-center justify-center gap-2.5 mb-8">
       <img src="<?= BASE_URL ?>/assets/icons/logo.svg" alt="" class="w-9 h-9">
       <div class="leading-tight">
