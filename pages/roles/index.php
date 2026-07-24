@@ -49,8 +49,7 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
     <!-- Permission matrix -->
     <div class="bin-tag">
       <div class="px-5 py-4 border-b border-border">
-        <p class="eyebrow">dbo.ims_role_permissions</p>
-        <h2 class="font-display font-semibold text-ink">Permission Matrix</h2>
+        <h2 class="eyebrow-table">Permission Matrix</h2>
       </div>
 
       <div class="overflow-x-auto">

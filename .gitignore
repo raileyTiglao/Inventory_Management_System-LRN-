@@ -1,7 +1,26 @@
 node_modules/
+vendor/
 
 # Local test/debug scratch files
 test*.php
 Test*.php
 debug.log
 *.log
+
+# Claude Code local (machine-specific) settings
+.claude/settings.local.json
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment/secrets
+.env
+.env.*
