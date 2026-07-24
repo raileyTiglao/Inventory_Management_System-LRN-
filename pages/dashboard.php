@@ -106,7 +106,7 @@ $lowStock = array_map(fn($row) => [
             <p class="eyebrow">Ledger</p>
             <h2 class="font-display font-semibold text-ink">Recent Activity</h2>
           </div>
-          <a href="<?= BASE_URL ?>/pages/inventory/index.php" class="text-xs text-tag-amber hover:underline">View inventory</a>
+          <a href="<?= BASE_URL ?>/pages/activity-log.php" class="text-xs text-tag-amber hover:underline">View full log</a>
         </div>
         <div class="divide-y divide-border/60">
           <?php if (empty($activity)): ?>

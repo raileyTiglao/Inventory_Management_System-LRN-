@@ -95,7 +95,7 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
   const CAN_DELETE = <?= json_encode($canDelete) ?>;
   const CURRENT_USER_ID = <?= json_encode((int)($currentUser['id'] ?? 0)) ?>;
 
-  const state = { limit: 10, offset: 0, total: 0, users: [] };
+  const state = { limit: 10, offset: 0, total: 0, users: [], search: '' };
 
   function esc(value) {
     return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -127,7 +127,7 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
     tbody.innerHTML = '<tr><td colspan="7" class="text-center text-ink-dim py-8">Loading users…</td></tr>';
 
     try {
-      const res = await fetch(`${BASE_URL}/api/users.php?limit=${state.limit}&offset=${state.offset}`);
+      const res = await fetch(`${BASE_URL}/api/users.php?limit=${state.limit}&offset=${state.offset}&q=${encodeURIComponent(state.search)}`);
       const json = await res.json();
 
       if (!json.success) {
@@ -147,12 +147,7 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
 
   function renderTable() {
     const tbody = document.getElementById('user-tbody');
-    const q = (document.getElementById('user-search').value || '').toLowerCase();
-
-    const rows = state.users.filter(u =>
-      !q || u.email.toLowerCase().includes(q) ||
-      (u.first_name + ' ' + u.last_name).toLowerCase().includes(q)
-    );
+    const rows = state.users;
 
     if (rows.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" class="text-center text-ink-dim py-8">No users found.</td></tr>';
@@ -334,7 +329,15 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
     }
   }
 
-  document.getElementById('user-search').addEventListener('input', renderTable);
+  let searchDebounce;
+  document.getElementById('user-search').addEventListener('input', (e) => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      state.search = e.target.value.trim();
+      state.offset = 0;
+      loadUsers();
+    }, 250);
+  });
 
   loadUsers();
 </script>

@@ -48,18 +48,32 @@ try {
             // List all users with pagination
             $limit = (int)($_GET['limit'] ?? 50);
             $offset = (int)($_GET['offset'] ?? 0);
+            $search = trim($_GET['q'] ?? '');
 
-            $stmt = $db->prepare('
-                SELECT u.user_id, u.email, u.first_name, u.last_name, u.status, 
+            $where = '';
+            $likeParams = [];
+            if ($search !== '') {
+                $where = 'WHERE u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR (u.first_name + \' \' + u.last_name) LIKE ?';
+                $like = '%' . str_replace(['%', '_'], ['[%]', '[_]'], $search) . '%';
+                $likeParams = [$like, $like, $like, $like];
+            }
+
+            $stmt = $db->prepare("
+                SELECT u.user_id, u.email, u.first_name, u.last_name, u.status,
                        u.last_login, u.created_at, r.role_name, r.role_id,
                        COUNT(*) OVER() as total_count
                 FROM dbo.ims_users u
                 JOIN dbo.ims_roles r ON u.role_id = r.role_id
+                $where
                 ORDER BY u.created_at DESC
                 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-            ');
-            $stmt->bindValue(1, $offset, PDO::PARAM_INT);
-            $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+            ");
+            $paramIndex = 1;
+            foreach ($likeParams as $p) {
+                $stmt->bindValue($paramIndex++, $p, PDO::PARAM_STR);
+            }
+            $stmt->bindValue($paramIndex++, $offset, PDO::PARAM_INT);
+            $stmt->bindValue($paramIndex++, $limit, PDO::PARAM_INT);
             $stmt->execute();
             $users = $stmt->fetchAll();
 

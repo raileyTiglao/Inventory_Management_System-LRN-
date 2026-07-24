@@ -20,6 +20,10 @@
           <?= icon('package', 'w-4.5 h-4.5') ?>
           <span>Inventory</span>
         </a>
+        <a href="<?= BASE_URL ?>/pages/activity-log.php" class="sidebar-link <?= is_active('activity-log') ?>">
+          <?= icon('clock', 'w-4.5 h-4.5') ?>
+          <span>Activity Log</span>
+        </a>
       </div>
     </div>
 

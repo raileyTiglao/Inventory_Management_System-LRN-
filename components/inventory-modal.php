@@ -13,8 +13,12 @@
 
       <p id="inventory-form-error" class="hidden text-xs text-stock-out bg-stock-out/10 border border-stock-out/30 rounded-tag px-3 py-2"></p>
 
-      <div class="grid grid-cols-2 gap-4">
-        <div>
+      <div id="item-readonly-summary" class="hidden flex items-center gap-4 text-xs bg-white/5 border border-border-light rounded-tag px-3 py-2">
+        <span class="text-ink-dim">Enter New Values <span id="item-sku_code-display" class="font-mono text-ink-muted"></span></span>
+      </div>
+
+      <div id="item-grid-top" class="grid grid-cols-2 gap-4">
+        <div id="item-sku-field">
           <label class="field-label">SKU code</label>
           <input type="text" id="item-sku_code" class="field-input font-mono" placeholder="SKU-1234" required>
         </div>
@@ -29,11 +33,10 @@
         <textarea id="item-description" class="field-input" rows="2" placeholder="Optional details"></textarea>
       </div>
 
-      <div class="grid grid-cols-3 gap-4">
-        <div>
-          <label class="field-label" id="item-quantity_on_hand-label">Initial qty</label>
+      <div id="item-grid-bottom" class="grid grid-cols-3 gap-4">
+        <div id="item-qty-field">
+          <label class="field-label">Initial qty</label>
           <input type="number" id="item-quantity_on_hand" class="field-input" min="0" step="1" value="0">
-          <p id="item-quantity_on_hand-hint" class="hidden text-[11px] text-ink-dim mt-1.5">Use Receive/Issue to change stock.</p>
         </div>
         <div>
           <label class="field-label">Reorder level</label>

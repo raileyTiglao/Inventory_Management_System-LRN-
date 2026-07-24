@@ -282,8 +282,11 @@ $canDelete = has_permission('Inventory', 'delete');
     document.getElementById('inventory-form-error').classList.add('hidden');
 
     const qtyInput = document.getElementById('item-quantity_on_hand');
-    const qtyLabel = document.getElementById('item-quantity_on_hand-label');
-    const qtyHint = document.getElementById('item-quantity_on_hand-hint');
+    const skuField = document.getElementById('item-sku-field');
+    const qtyField = document.getElementById('item-qty-field');
+    const gridTop = document.getElementById('item-grid-top');
+    const gridBottom = document.getElementById('item-grid-bottom');
+    const summary = document.getElementById('item-readonly-summary');
 
     if (id) {
       const item = state.items.find(i => i.sku_id === id);
@@ -296,19 +299,22 @@ $canDelete = has_permission('Inventory', 'delete');
         qtyInput.value = item.quantity_on_hand;
         document.getElementById('item-reorder_level').value = item.reorder_level;
         document.getElementById('item-unit_cost').value = item.unit_cost ?? '';
+        document.getElementById('item-sku_code-display').textContent = item.sku_code;
+        document.getElementById('item-quantity_on_hand-display').textContent = item.quantity_on_hand;
       }
-      document.getElementById('item-sku_code').readOnly = true;
-      qtyInput.readOnly = true;
-      qtyInput.classList.add('opacity-60', 'cursor-not-allowed');
-      qtyLabel.textContent = 'Qty on hand';
-      qtyHint.classList.remove('hidden');
+
+      skuField.classList.add('hidden');
+      qtyField.classList.add('hidden');
+      gridTop.classList.replace('grid-cols-2', 'grid-cols-1');
+      gridBottom.classList.replace('grid-cols-3', 'grid-cols-2');
+      summary.classList.remove('hidden');
     } else {
       document.getElementById('inventory-modal-title').textContent = 'Add Item';
-      document.getElementById('item-sku_code').readOnly = false;
-      qtyInput.readOnly = false;
-      qtyInput.classList.remove('opacity-60', 'cursor-not-allowed');
-      qtyLabel.textContent = 'Initial qty';
-      qtyHint.classList.add('hidden');
+      skuField.classList.remove('hidden');
+      qtyField.classList.remove('hidden');
+      gridTop.classList.replace('grid-cols-1', 'grid-cols-2');
+      gridBottom.classList.replace('grid-cols-2', 'grid-cols-3');
+      summary.classList.add('hidden');
     }
 
     document.getElementById('inventory-modal').classList.remove('hidden');
