@@ -116,6 +116,17 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  // A session typically stays valid ~20-30min after the last request; inside
+  // that window we treat the user as still on the site rather than just
+  // "recently" logged in.
+  const ONLINE_WINDOW_MS = 20 * 60 * 1000;
+
+  function isOnlineNow(value) {
+    if (!value) return false;
+    const d = new Date(value.replace(' ', 'T') + 'Z');
+    return (Date.now() - d.getTime()) < ONLINE_WINDOW_MS;
+  }
+
   function roleBadgeClass(roleName) {
     if (roleName === 'Administrator') return 'badge-amber';
     if (/manager/i.test(roleName)) return 'badge-green';
@@ -135,7 +146,15 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
         return;
       }
 
-      state.users = json.data.users || [];
+      // SQL Server (via PDO_SQLSRV) returns integer columns as PHP strings,
+      // which json_encode preserves as JSON strings — normalize here so
+      // strict-equality lookups (e.g. openUserModal's state.users.find)
+      // against numeric ids from onclick="...(${u.user_id})" actually match.
+      state.users = (json.data.users || []).map(u => ({
+        ...u,
+        user_id: Number(u.user_id),
+        role_id: Number(u.role_id),
+      }));
       state.total = json.data.total || 0;
 
       renderTable();
@@ -160,6 +179,10 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
         ? '<span class="badge-green">Active</span>'
         : '<span class="badge-red">Inactive</span>';
 
+      const lastActive = isOnlineNow(u.last_login)
+        ? '<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-stock-in"></span>Online now</span>'
+        : esc(formatLastLogin(u.last_login));
+
       const actions = [];
       if (CAN_EDIT) {
         actions.push(`<button onclick="openUserModal(${u.user_id})" class="icon-btn-amber" title="Edit">${iconEdit()}</button>`);
@@ -182,7 +205,7 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
           <td class="font-mono text-xs">${esc(u.email)}</td>
           <td><span class="${roleBadgeClass(u.role_name)}">${esc(u.role_name)}</span></td>
           <td>${statusBadge}</td>
-          <td class="text-xs">${esc(formatLastLogin(u.last_login))}</td>
+          <td class="text-xs">${lastActive}</td>
           <td>
             <div class="flex items-center justify-end gap-1.5">${actions.join('')}</div>
           </td>
@@ -227,6 +250,8 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
       : 'Required for new accounts.';
 
     const emailInput = document.getElementById('user-email');
+    const emailField = document.getElementById('user-email-field');
+    const summary = document.getElementById('user-readonly-summary');
 
     if (id) {
       const u = state.users.find(x => x.user_id === id);
@@ -238,12 +263,15 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
         emailInput.value = u.email;
         document.getElementById('user-role_id').value = u.role_id;
         document.getElementById('user-status').value = u.status;
+        document.getElementById('user-email-display').textContent = u.email;
       }
-      emailInput.readOnly = true;
+      emailField.classList.add('hidden');
+      summary.classList.remove('hidden');
     } else {
       document.getElementById('user-modal-title').textContent = 'Add User';
       document.getElementById('user-status').value = 'active';
-      emailInput.readOnly = false;
+      emailField.classList.remove('hidden');
+      summary.classList.add('hidden');
     }
 
     document.getElementById('user-modal').classList.remove('hidden');

@@ -7,7 +7,19 @@ require_once __DIR__ . '/../bootstrap.php';
 require_once __DIR__ . '/../connection/db.php';
 require_once __DIR__ . '/session.php';
 
+// Login rate limiting — lightweight/session-based for now (testing only;
+// resets if the browser session is cleared, and isn't shared across
+// browsers). Revisit with a DB- or IP-based store before relying on this.
+const LOGIN_ATTEMPT_LIMIT = 3;
+const LOGIN_LOCKOUT_SECONDS = 10;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $lockedUntil = $_SESSION['login_locked_until'] ?? 0;
+    if ($lockedUntil > time()) {
+        header('Location: ' . BASE_URL . '/pages/login.php?error=locked');
+        exit;
+    }
+
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
@@ -21,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Query user by email with role info
         $stmt = $db->prepare('
-            SELECT u.user_id, u.email, u.first_name, u.last_name, u.password_hash, 
+            SELECT u.user_id, u.email, u.first_name, u.last_name, u.password_hash,
                    u.role_id, u.status, r.role_name
             FROM dbo.ims_users u
             JOIN dbo.ims_roles r ON u.role_id = r.role_id
@@ -31,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
         if (!$user) {
+            register_failed_login_attempt();
             header('Location: ' . BASE_URL . '/pages/login.php?error=invalid');
             exit;
         }
@@ -40,10 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // TEMPORARILY SKIP PASSWORD VERIFICATION
-        // TODO: Fix password hashing later
+        if (!password_verify($password, $user['password_hash'])) {
+            register_failed_login_attempt();
+            header('Location: ' . BASE_URL . '/pages/login.php?error=invalid');
+            exit;
+        }
 
         // Password verified — load user into session
+        $_SESSION['login_attempts'] = 0;
+        $_SESSION['login_locked_until'] = 0;
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['user'] = [
             'id' => $user['user_id'],
@@ -65,6 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Login error: " . $e->getMessage());
         header('Location: ' . BASE_URL . '/pages/login.php?error=server');
         exit;
+    }
+}
+
+function register_failed_login_attempt(): void
+{
+    $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
+    if ($_SESSION['login_attempts'] >= LOGIN_ATTEMPT_LIMIT) {
+        $_SESSION['login_locked_until'] = time() + LOGIN_LOCKOUT_SECONDS;
+        $_SESSION['login_attempts'] = 0;
     }
 }
 

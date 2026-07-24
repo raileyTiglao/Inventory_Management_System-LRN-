@@ -35,6 +35,7 @@ $pageTitle = 'Sign In';
             'invalid' => 'Invalid email or password.',
             'inactive' => 'Your account has been deactivated.',
             'server' => 'Server error. Please try again later.',
+            'locked' => 'Too many failed attempts. Please wait a moment and try again.',
         ];
         if ($error && isset($messages[$error])): ?>
           <div class="px-7 pt-4 pb-0">
@@ -54,7 +55,7 @@ $pageTitle = 'Sign In';
         <div>
           <div class="flex items-center justify-between mb-1.5">
             <label class="field-label !mb-0">Password</label>
-            <a href="#" class="text-[11px] text-tag-amber hover:underline">Forgot?</a>
+            <button type="button" onclick="openForgotPasswordModal()" class="text-[11px] text-tag-amber hover:underline">Forgot?</button>
           </div>
           <input type="password" name="password" required class="field-input" placeholder="••••••••">
         </div>
@@ -73,6 +74,33 @@ $pageTitle = 'Sign In';
 
     <p class="text-center text-[11px] text-ink-dim mt-6">Access is limited to authorized personnel.</p>
   </div>
+
+  <div id="forgot-password-modal" class="hidden flex modal-overlay">
+    <div class="bin-tag modal-panel-sm">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Account Recovery</p>
+          <h2 class="font-display font-semibold text-ink">Forgot your password?</h2>
+        </div>
+        <button type="button" onclick="closeForgotPasswordModal()" class="icon-btn-muted">✕</button>
+      </div>
+      <div class="p-5 space-y-4">
+        <p class="text-sm text-ink-muted">Password resets are handled by your system administrator. Reach out to them directly with your account email to get back in.</p>
+        <div class="modal-footer">
+          <button type="button" onclick="closeForgotPasswordModal()" class="btn-primary">Got it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').classList.remove('hidden');
+    }
+    function closeForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').classList.add('hidden');
+    }
+  </script>
 
 </body>
 </html>

@@ -42,15 +42,25 @@ try {
             $limit = (int)($_GET['limit'] ?? 50);
             $offset = (int)($_GET['offset'] ?? 0);
             $status = $_GET['status'] ?? 'active';
+            $lowStockOnly = ($_GET['low_stock'] ?? '') === '1';
             $filterByStatus = in_array($status, ['active', 'archived'], true);
-            $where = $filterByStatus ? 'WHERE status = ?' : '';
+
+            $conditions = [];
+            if ($filterByStatus) {
+                $conditions[] = 'status = ?';
+            }
+            if ($lowStockOnly) {
+                $conditions[] = 'quantity_on_hand <= reorder_level';
+            }
+            $where = $conditions ? ('WHERE ' . implode(' AND ', $conditions)) : '';
+            $orderBy = $lowStockOnly ? '(quantity_on_hand - reorder_level) ASC, sku_code' : 'sku_code';
 
             $stmt = $db->prepare("
                 SELECT *,
                        COUNT(*) OVER() as total_count
                 FROM dbo.ims_inventory
                 $where
-                ORDER BY sku_code
+                ORDER BY $orderBy
                 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
             ");
             $paramIndex = 1;

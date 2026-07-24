@@ -138,7 +138,11 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
         return;
       }
 
-      roles = json.data || [];
+      // SQL Server (via PDO_SQLSRV) returns integer columns as PHP strings,
+      // which json_encode preserves as JSON strings — normalize here so
+      // strict-equality lookups (e.g. openRoleModal's roles.find) against
+      // numeric ids from onclick="...(${r.role_id})" actually match.
+      roles = (json.data || []).map(r => ({ ...r, role_id: Number(r.role_id) }));
       renderRoleCards();
     } catch (err) {
       container.innerHTML = '<p class="text-sm text-stock-out col-span-full py-8 text-center">Could not reach the server. Please try again.</p>';

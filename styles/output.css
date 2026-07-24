@@ -338,6 +338,71 @@ body{
   --tw-text-opacity:1;
   color:rgb(232 163 61/var(--tw-text-opacity,1))
 }
+.sidebar-shell{
+  transition-property:width;
+  transition-timing-function:cubic-bezier(.4,0,.2,1);
+  transition-duration:.2s
+}
+.sidebar-collapsed{
+  width:4.5rem!important
+}
+.sidebar-collapsed .sidebar-label,
+.sidebar-collapsed .sidebar-search{
+  display:none
+}
+.sidebar-collapsed .sidebar-link{
+  justify-content:center
+}
+#sidebar-toggle-icon{
+  display:inline-flex;
+  transition:transform .2s ease-in-out
+}
+.sidebar-collapsed #sidebar-toggle-icon{
+  transform:rotate(180deg)
+}
+.sidebar-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:9999px;
+  background-color:#D9534F;
+  color:#fff;
+  font-family:'JetBrains Mono',monospace;
+  min-width:1.25rem;
+  height:1.25rem;
+  padding:0 .3rem;
+  font-size:.625rem;
+  line-height:1
+}
+.sidebar-brand-footer{
+  margin-top:auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding-top:1.5rem;
+  padding-bottom:.5rem
+}
+.sidebar-brand-logo{
+  height:5rem;
+  width:auto;
+  transition:opacity .15s ease-in-out;
+  opacity:.6
+}
+.sidebar-brand-logo:hover{
+  opacity:1
+}
+.notif-panel{
+  position:absolute;
+  margin-top:.5rem;
+  z-index:10;
+  top:100%;
+  right:0;
+  width:20rem
+}
+.notif-body{
+  max-height:20rem;
+  overflow-y:auto
+}
 .btn-primary{
   display:inline-flex;
   align-items:center;
@@ -626,6 +691,9 @@ body{
 .h-4{
   height:1rem
 }
+.h-\[18px\]{
+  height:18px
+}
 .h-7{
   height:1.75rem
 }
@@ -658,6 +726,9 @@ body{
 }
 .w-4{
   width:1rem
+}
+.w-\[18px\]{
+  width:18px
 }
 .w-56{
   width:14rem
@@ -778,6 +849,9 @@ body{
 }
 .overflow-hidden{
   overflow:hidden
+}
+.overflow-x-hidden{
+  overflow-x:hidden
 }
 .overflow-x-auto{
   overflow-x:auto
@@ -913,6 +987,14 @@ body{
 .py-4{
   padding-top:1rem;
   padding-bottom:1rem
+}
+.py-3{
+  padding-top:.75rem;
+  padding-bottom:.75rem
+}
+.py-6{
+  padding-top:1.5rem;
+  padding-bottom:1.5rem
 }
 .\!pl-9{
   padding-left:2.25rem!important

@@ -19,6 +19,7 @@ function icon(string $name, string $class = 'w-5 h-5'): string
         'edit' => '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/>',
         'trash' => '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>',
         'chevron-down' => '<path d="M6 9l6 6 6-6"/>',
+        'chevron-left' => '<path d="M15 6l-6 6 6 6"/>',
         'trend-up' => '<path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/>',
         'trend-down' => '<path d="M3 7l6 6 4-4 8 8"/><path d="M21 17v-6h-6"/>',
         'alert' => '<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/>',

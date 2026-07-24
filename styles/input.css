@@ -38,6 +38,63 @@
     @apply bg-tag-amber/10 text-tag-amber border border-tag-amber/30;
   }
 
+  /* Collapsed state toggled by JS in components/sidebar.php. */
+  .sidebar-shell {
+    @apply transition-[width] duration-200;
+  }
+  .sidebar-collapsed {
+    width: 4.5rem !important;
+  }
+  .sidebar-collapsed .sidebar-label,
+  .sidebar-collapsed .sidebar-search {
+    @apply hidden;
+  }
+  .sidebar-collapsed .sidebar-link {
+    @apply justify-center;
+  }
+  #sidebar-toggle-icon {
+    @apply inline-flex transition-transform duration-200;
+  }
+  .sidebar-collapsed #sidebar-toggle-icon {
+    @apply rotate-180;
+  }
+  .sidebar-badge {
+    @apply inline-flex items-center justify-center rounded-full bg-stock-out text-white font-mono;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.3rem;
+    font-size: 0.625rem;
+    line-height: 1;
+  }
+
+  /* Fills the leftover space nav's flex-1 leaves above the footer, pinning
+     the "powered by" logo just above Sign out. */
+  .sidebar-brand-footer {
+    @apply mt-auto flex items-center justify-center;
+    padding-top: 1.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .sidebar-brand-logo {
+    @apply w-auto transition-opacity;
+    height: 2.75rem;
+    opacity: 0.6;
+  }
+  .sidebar-brand-logo:hover {
+    opacity: 1;
+  }
+
+  /* Notification dropdown, toggled by JS in components/topbar.php. */
+  .notif-panel {
+    @apply absolute mt-2 z-10;
+    top: 100%;
+    right: 0;
+    width: 20rem;
+  }
+  .notif-body {
+    max-height: 20rem;
+    overflow-y: auto;
+  }
+
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 bg-tag-amber text-base-deep font-semibold text-sm px-4 py-2.5 rounded-tag hover:bg-tag-amberdark transition-colors;
   }

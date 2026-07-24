@@ -66,16 +66,16 @@ GO
 
 -- Insert test users
 -- Passwords: use PHP password_hash('password123', PASSWORD_BCRYPT) to generate hashes
--- For testing: $2y$10$eImiTXuWVxfaHNYY0iNAiOjxT3K7W5JwSCsC8QfRu.VxGt4rWXyVu (bcrypt of 'password123')
+-- For testing: $2y$10$rE4BJg1NzxgMZIZJ37UNm.eBAAv32bOPuHw27eaIRXR9CgljA1gpO (bcrypt of 'password123')
 IF NOT EXISTS (SELECT 1 FROM dbo.ims_users WHERE email = 'alex.rivera@ims.local')
 BEGIN
     INSERT INTO dbo.ims_users (email, first_name, last_name, password_hash, role_id, status)
     VALUES
-        ('jWick@ims.local', 'John', 'Wick', '$2y$10$eImiTXuWVxfaHNYY0iNAiOjxT3K7W5JwSCsC8QfRu.VxGt4rWXyVu', 1, 'active'),
-        ('tStark@ims.local', 'Tony', 'Stark', '$2y$10$eImiTXuWVxfaHNYY0iNAiOjxT3K7W5JwSCsC8QfRu.VxGt4rWXyVu', 2, 'active'),
-        ('pParker@ims.local', 'Peter', 'Parker', '$2y$10$eImiTXuWVxfaHNYY0iNAiOjxT3K7W5JwSCsC8QfRu.VxGt4rWXyVu', 3, 'active'),
-        ('bWayne@ims.local', 'Brunce', 'Wayne', '$2y$10$eImiTXuWVxfaHNYY0iNAiOjxT3K7W5JwSCsC8QfRu.VxGt4rWXyVu', 3, 'inactive'),
-        ('jDoe@ims.local', 'John', 'Doe', '$2ys$10$eImiTXuWVxfaHNYY0iNAiOjxT3K7W5JwSCsC8QfRu.VxGt4rWXyVu', 4, 'active');
+        ('jWick@ims.local', 'John', 'Wick', '$2y$10$rE4BJg1NzxgMZIZJ37UNm.eBAAv32bOPuHw27eaIRXR9CgljA1gpO', 1, 'active'),
+        ('tStark@ims.local', 'Tony', 'Stark', '$2y$10$rE4BJg1NzxgMZIZJ37UNm.eBAAv32bOPuHw27eaIRXR9CgljA1gpO', 2, 'active'),
+        ('pParker@ims.local', 'Peter', 'Parker', '$2y$10$rE4BJg1NzxgMZIZJ37UNm.eBAAv32bOPuHw27eaIRXR9CgljA1gpO', 3, 'active'),
+        ('bWayne@ims.local', 'Brunce', 'Wayne', '$2y$10$rE4BJg1NzxgMZIZJ37UNm.eBAAv32bOPuHw27eaIRXR9CgljA1gpO', 3, 'inactive'),
+        ('jDoe@ims.local', 'John', 'Doe', '$2y$10$rE4BJg1NzxgMZIZJ37UNm.eBAAv32bOPuHw27eaIRXR9CgljA1gpO', 4, 'active');
 END
 GO
 

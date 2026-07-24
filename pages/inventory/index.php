@@ -141,7 +141,14 @@ $canDelete = has_permission('Inventory', 'delete');
         return;
       }
 
-      state.items = json.data.items || [];
+      // SQL Server (via PDO_SQLSRV) returns integer columns as PHP strings,
+      // which json_encode preserves as JSON strings — normalize here so
+      // strict-equality lookups (e.g. openItemModal's state.items.find)
+      // against numeric ids from onclick="...(${item.sku_id})" actually match.
+      state.items = (json.data.items || []).map(item => ({
+        ...item,
+        sku_id: Number(item.sku_id),
+      }));
       state.total = json.data.total || 0;
 
       renderTable();
