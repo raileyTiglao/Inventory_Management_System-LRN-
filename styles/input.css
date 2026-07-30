@@ -119,6 +119,18 @@
     font-size: 0.625rem;
     line-height: 1;
   }
+  /* Collapsed-mode stand-in for .sidebar-badge — the numeric badge hides
+     with the rest of .sidebar-label, so a plain dot keeps the low-stock
+     alert visible on the icon itself. Base rule hides it by default (not
+     the `hidden` utility — that lives in a later cascade layer and would
+     always win over a components-layer override, no matter the selector). */
+  .sidebar-collapsed-dot {
+    @apply absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-stock-out;
+    display: none;
+  }
+  .sidebar-collapsed .sidebar-collapsed-dot {
+    display: block;
+  }
 
   /* Fills the leftover space nav's flex-1 leaves above the footer, pinning
      the "powered by" logo just above Sign out. */

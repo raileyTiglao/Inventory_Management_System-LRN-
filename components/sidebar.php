@@ -43,7 +43,12 @@ if (has_permission('Inventory', 'view')) {
             <span class="sidebar-label">Dashboard</span>
           </a>
           <a href="<?= BASE_URL ?>/pages/inventory/index.php" class="sidebar-link <?= is_active('inventory') ?>">
-            <?= icon('package', 'w-[18px] h-[18px] shrink-0') ?>
+            <span class="relative shrink-0">
+              <?= icon('package', 'w-[18px] h-[18px]') ?>
+              <?php if ($sidebarLowStockCount > 0): ?>
+                <span class="sidebar-collapsed-dot" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"></span>
+              <?php endif; ?>
+            </span>
             <span class="sidebar-label flex-1">Inventory</span>
             <?php if ($sidebarLowStockCount > 0): ?>
               <span class="sidebar-badge sidebar-label" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"><?= $sidebarLowStockCount ?></span>
