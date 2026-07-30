@@ -107,6 +107,7 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
 </div>
 
 <?php include __DIR__ . '/../../components/user-modal.php'; ?>
+<?php include __DIR__ . '/../../components/delete-user-modal.php'; ?>
 
 <script>
   const BASE_URL = <?= json_encode(BASE_URL) ?>;
@@ -368,8 +369,23 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
     }
   });
 
-  async function deleteUser(id, name) {
-    if (!confirm(`Delete ${name}? This cannot be undone.`)) return;
+  let pendingDeleteUserId = null;
+
+  function deleteUser(id, name) {
+    pendingDeleteUserId = id;
+    document.getElementById('delete-user-modal-name').textContent = name;
+    document.getElementById('delete-user-modal').classList.remove('hidden');
+  }
+
+  function closeDeleteUserModal() {
+    document.getElementById('delete-user-modal').classList.add('hidden');
+    pendingDeleteUserId = null;
+  }
+
+  async function confirmDeleteUser() {
+    const id = pendingDeleteUserId;
+    closeDeleteUserModal();
+    if (id == null) return;
 
     try {
       const res = await fetch(`${BASE_URL}/api/users.php?id=${id}`, { method: 'DELETE' });

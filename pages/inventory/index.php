@@ -120,6 +120,7 @@ $canDelete = has_permission('Inventory', 'delete');
 
 <?php include __DIR__ . '/../../components/inventory-modal.php'; ?>
 <?php include __DIR__ . '/../../components/stock-movement-modal.php'; ?>
+<?php include __DIR__ . '/../../components/archive-modal.php'; ?>
 
 <script>
   const BASE_URL = <?= json_encode(BASE_URL) ?>;
@@ -402,9 +403,7 @@ $canDelete = has_permission('Inventory', 'delete');
     }
   });
 
-  async function setItemStatus(id, skuCode, status, confirmMessage) {
-    if (confirmMessage && !confirm(confirmMessage)) return;
-
+  async function setItemStatus(id, status) {
     try {
       const res = await fetch(`${BASE_URL}/api/inventory.php`, {
         method: 'PUT',
@@ -423,12 +422,27 @@ $canDelete = has_permission('Inventory', 'delete');
     }
   }
 
+  let pendingArchiveId = null;
+
   function archiveItem(id, skuCode) {
-    return setItemStatus(id, skuCode, 'archived', `Archive ${skuCode}? It will be hidden from the active list, but its history is kept and it can be restored anytime.`);
+    pendingArchiveId = id;
+    document.getElementById('archive-modal-sku').textContent = skuCode;
+    document.getElementById('archive-modal').classList.remove('hidden');
+  }
+
+  function closeArchiveModal() {
+    document.getElementById('archive-modal').classList.add('hidden');
+    pendingArchiveId = null;
+  }
+
+  function confirmArchive() {
+    const id = pendingArchiveId;
+    closeArchiveModal();
+    if (id != null) setItemStatus(id, 'archived');
   }
 
   function restoreItem(id, skuCode) {
-    return setItemStatus(id, skuCode, 'active', null);
+    return setItemStatus(id, 'active');
   }
 
   document.getElementById('inventory-search').addEventListener('input', renderTable);
