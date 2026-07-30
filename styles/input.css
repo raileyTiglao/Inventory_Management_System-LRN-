@@ -85,25 +85,31 @@
     @apply bg-tag-amber/10 text-tag-amber border border-tag-amber/30;
   }
 
-  /* Collapsed state toggled by JS in components/sidebar.php. */
+  /* Collapsed state toggled by JS in components/sidebar.php.
+     Compound selector (not bare .sidebar-collapsed) is required here: Tailwind's
+     JIT engine silently drops a bare custom-class rule when that exact class
+     name also appears as a plain string elsewhere in the scanned content (here,
+     the classList.toggle('sidebar-collapsed') call in scripts/sidebar.js) —
+     confirmed by isolated build testing. Descendant/compound selectors using
+     the same class are unaffected, only the bare single-class rule is. */
   .sidebar-shell {
     @apply transition-[width] duration-200;
   }
-  .sidebar-collapsed {
+  .sidebar-shell.sidebar-collapsed {
     width: 4.5rem !important;
   }
   .sidebar-collapsed .sidebar-label,
   .sidebar-collapsed .sidebar-search {
     @apply hidden;
   }
-  .sidebar-collapsed .sidebar-link {
+  /* With the logo+wordmark hidden, only the toggle button remains in this
+     row — center it instead of leaving it pinned to justify-between's start
+     position (a lone flex item under space-between doesn't center itself). */
+  .sidebar-collapsed .sidebar-header {
     @apply justify-center;
   }
-  #sidebar-toggle-icon {
-    @apply inline-flex transition-transform duration-200;
-  }
-  .sidebar-collapsed #sidebar-toggle-icon {
-    @apply rotate-180;
+  .sidebar-collapsed .sidebar-link {
+    @apply justify-center;
   }
   .sidebar-badge {
     @apply inline-flex items-center justify-center rounded-full bg-stock-out text-white font-mono;

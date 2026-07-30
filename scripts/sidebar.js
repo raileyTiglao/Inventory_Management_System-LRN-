@@ -2,14 +2,24 @@
   var STORAGE_KEY = 'ims-sidebar-collapsed';
   var sidebar = document.getElementById('sidebar');
   var toggle = document.getElementById('sidebar-toggle');
+  var expandedIcon = document.getElementById('sidebar-toggle-icon-expanded');
+  var collapsedIcon = document.getElementById('sidebar-toggle-icon-collapsed');
 
-  if (localStorage.getItem(STORAGE_KEY) === '1') {
+  function reflectToggleIcon(collapsed) {
+    expandedIcon.classList.toggle('hidden', collapsed);
+    collapsedIcon.classList.toggle('hidden', !collapsed);
+  }
+
+  var startCollapsed = localStorage.getItem(STORAGE_KEY) === '1';
+  if (startCollapsed) {
     sidebar.classList.add('sidebar-collapsed');
   }
+  reflectToggleIcon(startCollapsed);
 
   toggle.addEventListener('click', function () {
     var collapsed = sidebar.classList.toggle('sidebar-collapsed');
     localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0');
+    reflectToggleIcon(collapsed);
   });
 
   var searchInput = document.getElementById('sidebar-nav-search');

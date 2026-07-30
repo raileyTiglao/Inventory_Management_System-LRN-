@@ -12,16 +12,17 @@ if (has_permission('Inventory', 'view')) {
 ?>
 <aside id="sidebar" class="sidebar-shell w-64 shrink-0 bg-base-deep border-r border-border flex flex-col h-screen sticky top-0 overflow-hidden">
 
-  <div class="h-16 flex items-center justify-between gap-2.5 px-5 border-b border-border">
-    <div class="flex items-center gap-2.5 min-w-0">
+  <div class="sidebar-header h-16 flex items-center justify-between gap-2.5 px-5 border-b border-border">
+    <div class="flex items-center gap-2.5 min-w-0 sidebar-label">
       <img src="<?= BASE_URL ?>/assets/icons/logo.svg" alt="" class="w-7 h-7 shrink-0">
-      <div class="leading-tight sidebar-label">
+      <div class="leading-tight">
         <p class="font-display font-semibold text-ink text-[15px]">IMS</p>
         <p class="eyebrow -mt-0.5">Inventory System</p>
       </div>
     </div>
     <button type="button" id="sidebar-toggle" class="icon-btn-muted shrink-0" title="Collapse sidebar">
-      <span id="sidebar-toggle-icon"><?= icon('chevron-left', 'w-4 h-4') ?></span>
+      <span id="sidebar-toggle-icon-expanded"><?= icon('panel-left', 'w-4 h-4') ?></span>
+      <span id="sidebar-toggle-icon-collapsed" class="hidden"><?= icon('panel-right', 'w-4 h-4') ?></span>
     </button>
   </div>
 

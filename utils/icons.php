@@ -29,6 +29,10 @@ function icon(string $name, string $class = 'w-5 h-5'): string
         'moon' => '<path d="M20 14.5a8.5 8.5 0 11-8.5-10 6.5 6.5 0 008.5 10z"/>',
         'plus-circle' => '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
         'minus-circle' => '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+        // Sidebar panel-toggle pair: same panel+divider glyph, chevron direction
+        // flips to show which way the sidebar will move on click.
+        'panel-left' => '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/>',
+        'panel-right' => '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/>',
     ];
 
     $path = $icons[$name] ?? '';
