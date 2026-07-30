@@ -33,6 +33,7 @@ function icon(string $name, string $class = 'w-5 h-5'): string
         // flips to show which way the sidebar will move on click.
         'panel-left' => '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/>',
         'panel-right' => '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/>',
+        'filter' => '<path d="M4 4h16l-6.5 8.5v6l-3 1.5v-7.5z"/>',
     ];
 
     $path = $icons[$name] ?? '';

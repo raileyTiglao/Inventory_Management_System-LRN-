@@ -70,9 +70,23 @@ $canDelete = has_permission('Inventory', 'delete');
             <button type="button" id="filter-archived" onclick="setStatusFilter('archived')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Archived</button>
           </div>
         </div>
-        <div class="search-wrap w-full lg:w-64">
-          <span class="search-icon"><?= icon('search', 'w-4 h-4') ?></span>
-          <input type="text" id="inventory-search" placeholder="Search SKU or name..." class="search-input w-full">
+        <div class="flex items-center gap-2">
+          <div class="search-wrap w-full lg:w-64">
+            <span class="search-icon"><?= icon('search', 'w-4 h-4') ?></span>
+            <input type="text" id="inventory-search" placeholder="Search SKU or name..." class="search-input w-full">
+          </div>
+          <div class="relative">
+            <button type="button" id="inventory-sort-btn" class="icon-btn-muted relative" title="Sort / filter">
+              <?= icon('filter', 'w-4 h-4') ?>
+              <span id="inventory-sort-dot" class="hidden absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-tag-amber"></span>
+            </button>
+            <div id="inventory-sort-menu" class="hidden absolute right-0 mt-2 z-10 bin-tag w-44 py-1">
+              <button type="button" data-sort="" class="sort-option w-full text-left px-3 py-2 text-xs text-ink-muted hover:bg-overlay/10 hover:text-ink transition-colors">Default</button>
+              <button type="button" data-sort="qty_desc" class="sort-option w-full text-left px-3 py-2 text-xs text-ink-muted hover:bg-overlay/10 hover:text-ink transition-colors">Most qty</button>
+              <button type="button" data-sort="qty_asc" class="sort-option w-full text-left px-3 py-2 text-xs text-ink-muted hover:bg-overlay/10 hover:text-ink transition-colors">Least qty</button>
+              <button type="button" data-sort="low_stock" class="sort-option w-full text-left px-3 py-2 text-xs text-ink-muted hover:bg-overlay/10 hover:text-ink transition-colors">Low stock</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -127,7 +141,7 @@ $canDelete = has_permission('Inventory', 'delete');
   const CAN_EDIT = <?= json_encode($canEdit) ?>;
   const CAN_DELETE = <?= json_encode($canDelete) ?>;
 
-  const state = { limit: 10, offset: 0, total: 0, items: [], statusFilter: 'active', stats: { total_units: 0, total_value: 0, low_stock_count: 0 } };
+  const state = { limit: 10, offset: 0, total: 0, items: [], statusFilter: 'active', sort: '', stats: { total_units: 0, total_value: 0, low_stock_count: 0 } };
 
   function esc(value) {
     return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -145,7 +159,7 @@ $canDelete = has_permission('Inventory', 'delete');
     tbody.innerHTML = '<tr><td colspan="7" class="text-center text-ink-dim py-8">Loading inventory…</td></tr>';
 
     try {
-      const res = await fetch(`${BASE_URL}/api/inventory.php?limit=${state.limit}&offset=${state.offset}&status=${state.statusFilter}`);
+      const res = await fetch(`${BASE_URL}/api/inventory.php?limit=${state.limit}&offset=${state.offset}&status=${state.statusFilter}&sort=${encodeURIComponent(state.sort)}`);
       const json = await res.json();
 
       if (!json.success) {
@@ -274,6 +288,48 @@ $canDelete = has_permission('Inventory', 'delete');
 
     loadInventory();
   }
+
+  const SORT_LABELS = { '': 'Default', qty_desc: 'Most qty', qty_asc: 'Least qty', low_stock: 'Low stock' };
+
+  function setSort(sort) {
+    state.sort = sort;
+    state.offset = 0;
+
+    document.querySelectorAll('.sort-option').forEach(function (btn) {
+      const active = btn.dataset.sort === sort;
+      btn.classList.toggle('text-tag-amber', active);
+      btn.classList.toggle('text-ink-muted', !active);
+    });
+
+    const dot = document.getElementById('inventory-sort-dot');
+    dot.classList.toggle('hidden', sort === '');
+    document.getElementById('inventory-sort-btn').title = 'Sort / filter: ' + SORT_LABELS[sort];
+
+    document.getElementById('inventory-sort-menu').classList.add('hidden');
+    loadInventory();
+  }
+
+  (function () {
+    const btn = document.getElementById('inventory-sort-btn');
+    const menu = document.getElementById('inventory-sort-menu');
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('hidden');
+    });
+
+    menu.querySelectorAll('.sort-option').forEach(function (option) {
+      option.addEventListener('click', function () {
+        setSort(option.dataset.sort);
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== btn) {
+        menu.classList.add('hidden');
+      }
+    });
+  })();
 
   function iconEdit() {
     return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';

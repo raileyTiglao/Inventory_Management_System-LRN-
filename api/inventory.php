@@ -42,7 +42,8 @@ try {
             $limit = (int)($_GET['limit'] ?? 50);
             $offset = (int)($_GET['offset'] ?? 0);
             $status = $_GET['status'] ?? 'active';
-            $lowStockOnly = ($_GET['low_stock'] ?? '') === '1';
+            $sort = $_GET['sort'] ?? '';
+            $lowStockOnly = ($_GET['low_stock'] ?? '') === '1' || $sort === 'low_stock';
             $filterByStatus = in_array($status, ['active', 'archived'], true);
 
             $conditions = [];
@@ -53,7 +54,16 @@ try {
                 $conditions[] = 'quantity_on_hand <= reorder_level';
             }
             $where = $conditions ? ('WHERE ' . implode(' AND ', $conditions)) : '';
-            $orderBy = $lowStockOnly ? '(quantity_on_hand - reorder_level) ASC, sku_code' : 'sku_code';
+
+            if ($sort === 'qty_desc') {
+                $orderBy = 'quantity_on_hand DESC, sku_code';
+            } elseif ($sort === 'qty_asc') {
+                $orderBy = 'quantity_on_hand ASC, sku_code';
+            } elseif ($lowStockOnly) {
+                $orderBy = '(quantity_on_hand - reorder_level) ASC, sku_code';
+            } else {
+                $orderBy = 'sku_code';
+            }
 
             $stmt = $db->prepare("
                 SELECT *,
