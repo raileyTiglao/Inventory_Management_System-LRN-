@@ -14,13 +14,10 @@
 
       <p id="movement-form-error" class="hidden text-xs text-stock-out bg-stock-out/10 border border-stock-out/30 rounded-tag px-3 py-2"></p>
 
-      <div class="flex items-center gap-1.5 p-1 bg-base-deep border border-border rounded-tag">
-        <button type="button" id="move-type-in" onclick="setMoveType('in')" class="flex-1 py-2 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Receive (in)</button>
-        <button type="button" id="move-type-out" onclick="setMoveType('out')" class="flex-1 py-2 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Issue (out)</button>
-      </div>
+      <div id="move-type-badge" class="flex items-center gap-2 px-3 py-2.5 rounded-tag border text-xs font-mono uppercase tracking-wide"></div>
 
       <div>
-        <label class="field-label">Quantity</label>
+        <label class="field-label">Quantity <span class="required-marker">*</span></label>
         <input type="number" id="move-quantity" class="field-input" min="1" step="1" placeholder="0" required>
       </div>
 

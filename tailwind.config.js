@@ -1,4 +1,18 @@
 /** @type {import('tailwindcss').Config} */
+
+// Colors are driven by CSS custom properties (space-separated RGB triplets,
+// see styles/input.css :root / [data-theme="dark"]) so the app can switch
+// palettes at runtime while keeping Tailwind's opacity-modifier syntax
+// (e.g. bg-tag-amber/10) working.
+function withOpacity(variableName) {
+  return ({ opacityValue }) => {
+    if (opacityValue !== undefined) {
+      return `rgb(var(${variableName}) / ${opacityValue})`;
+    }
+    return `rgb(var(${variableName}))`;
+  };
+}
+
 module.exports = {
   content: [
     "./pages/**/*.php",
@@ -10,30 +24,37 @@ module.exports = {
     extend: {
       colors: {
         base: {
-          DEFAULT: "#14171C",   // graphite black - page background
-          raised: "#1C2028",    // surface / card background
-          deep: "#0F1216",      // sidebar / deepest layer
+          DEFAULT: withOpacity("--color-base"),   // page background
+          raised: withOpacity("--color-base-raised"),
+          deep: withOpacity("--color-base-deep"),  // sidebar / deepest layer
         },
-        surface: "#1C2028",
-        card: "#242933",
+        surface: withOpacity("--color-surface"),
+        card: withOpacity("--color-card"),
         border: {
-          DEFAULT: "#2A2F3A",
-          light: "#343B47",
+          DEFAULT: withOpacity("--color-border"),
+          light: withOpacity("--color-border-light"),
         },
         ink: {
-          DEFAULT: "#E8E6DF",   // warm off-white text
-          muted: "#8B92A0",     // secondary text
-          dim: "#5C6270",       // tertiary / placeholder text
+          DEFAULT: withOpacity("--color-ink"),        // primary text
+          muted: withOpacity("--color-ink-muted"),    // secondary text
+          dim: withOpacity("--color-ink-dim"),        // tertiary / placeholder text
+          // Text drawn on top of the amber accent (buttons/badges) must stay
+          // dark regardless of theme, since the amber accent itself doesn't
+          // change between light/dark.
+          onamber: "#14171C",
         },
         tag: {
-          amber: "#E8A33D",    // primary accent - hazard amber (bin tag)
-          amberdark: "#B87A22",
+          amber: withOpacity("--color-tag-amber"),    // primary accent - hazard amber (bin tag)
+          amberdark: withOpacity("--color-tag-amberdark"),
         },
         stock: {
-          in: "#4F9D69",        // stock-in / success
-          out: "#D9534F",       // stock-out / danger
-          low: "#D9A72E",       // low-stock warning
+          in: withOpacity("--color-stock-in"),        // stock-in / success
+          out: withOpacity("--color-stock-out"),      // stock-out / danger
+          low: withOpacity("--color-stock-low"),      // low-stock warning
         },
+        // Neutral hover/tint overlay — darkens on light surfaces, lightens on
+        // dark surfaces (replaces hardcoded bg-white/5-style tints).
+        overlay: withOpacity("--color-overlay"),
       },
       fontFamily: {
         display: ["'Space Grotesk'", "sans-serif"],

@@ -57,13 +57,13 @@ $pageTitle = 'Sign In';
 
       <form class="px-7 pb-7 pt-5 space-y-4" action="<?= BASE_URL ?>/auth/login.php" method="post">
         <div>
-          <label class="field-label">Email</label>
+          <label class="field-label">Email <span class="required-marker">*</span></label>
           <input type="email" name="email" required class="field-input" placeholder="you@ims.local">
         </div>
 
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <label class="field-label !mb-0">Password</label>
+            <label class="field-label !mb-0">Password <span class="required-marker">*</span></label>
             <button type="button" onclick="openForgotPasswordModal()" class="text-[11px] text-tag-amber hover:underline">Forgot?</button>
           </div>
           <input type="password" name="password" required class="field-input" placeholder="••••••••">

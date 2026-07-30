@@ -19,8 +19,13 @@ require_once __DIR__ . '/../utils/api.php';
 
 require_login();
 
+// Role management is admin-only, whatever permissions a role has been granted.
+if (!is_admin()) {
+    json_error('Forbidden', 403);
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
-$db = get_db();
+$db = Connection::get_connecton();
 
 try {
     if ($method === 'GET') {

@@ -37,7 +37,7 @@ $pageTitle = 'Activity Log';
             <button type="button" id="filter-out" onclick="setTypeFilter('out')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Issued</button>
           </div>
         </div>
-        <div class="search-wrap w-64">
+        <div class="search-wrap w-full lg:w-64">
           <span class="search-icon"><?= icon('search', 'w-4 h-4') ?></span>
           <input type="text" id="log-search" placeholder="Search SKU, item, or user..." class="search-input w-full">
         </div>
@@ -62,7 +62,18 @@ $pageTitle = 'Activity Log';
       </div>
 
       <div class="panel-footer">
-        <p class="text-xs text-ink-dim" id="log-count">Showing 0 of 0 entries</p>
+        <div class="flex items-center gap-3">
+          <p class="text-xs text-ink-dim" id="log-count">Showing 0 of 0 entries</p>
+          <div class="flex items-center gap-1.5">
+            <label for="log-page-size" class="text-xs text-ink-dim">Rows:</label>
+            <select id="log-page-size" onchange="changePageSize(this.value)" class="field-input !w-auto !py-1 !px-2 text-xs">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
         <div class="flex items-center gap-1.5">
           <button id="log-prev" onclick="changePage(-1)" class="pagination-btn" disabled>‹</button>
           <span class="pagination-page" id="log-page">1</span>
@@ -168,6 +179,12 @@ $pageTitle = 'Activity Log';
     loadLog();
   }
 
+  function changePageSize(value) {
+    state.limit = Number(value);
+    state.offset = 0;
+    loadLog();
+  }
+
   function setTypeFilter(type) {
     state.typeFilter = type;
     state.offset = 0;
@@ -175,7 +192,7 @@ $pageTitle = 'Activity Log';
     const btns = { '': 'filter-all', in: 'filter-in', out: 'filter-out' };
     Object.entries(btns).forEach(([value, id]) => {
       document.getElementById(id).className = 'px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors ' +
-        (value === type ? 'bg-tag-amber/10 text-tag-amber border border-tag-amber/30' : 'text-ink-dim hover:text-ink-muted');
+        (value === type ? 'bg-tag-amber/10 text-tag-amber border border-tag-amber/30' : 'text-ink-dim hover:bg-overlay/10 hover:text-ink-muted');
     });
 
     loadLog();

@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(/c/xampp/php/php.exe -l pages/inventory/index.php)",
-      "Bash(/c/xampp/php/php.exe -l components/inventory-modal.php)",
-      "Bash(/c/xampp/php/php.exe -l components/sidebar.php)"
-    ]
-  }
-}

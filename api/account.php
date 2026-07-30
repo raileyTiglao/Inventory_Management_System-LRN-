@@ -7,6 +7,7 @@
  * their own account regardless of role, and this endpoint only ever
  * touches the current session's own user_id, never an arbitrary one.
  *
+ * GET /api/account.php  → current user's profile (for the account modal)
  * PUT /api/account.php
  *   { first_name, last_name, current_password?, new_password? }
  */
@@ -21,15 +22,28 @@ require_once __DIR__ . '/../utils/api.php';
 require_login();
 
 $method = $_SERVER['REQUEST_METHOD'];
-$db = get_db();
+$db = Connection::get_connecton();
+$currentUser = logged_in_user();
+$userId = (int)$currentUser['id'];
+
+if ($method === 'GET') {
+    $stmt = $db->prepare('SELECT first_name, last_name FROM dbo.ims_users WHERE user_id = ?');
+    $stmt->execute([$userId]);
+    $profile = $stmt->fetch();
+
+    json_success([
+        'first_name' => $profile['first_name'] ?? '',
+        'last_name' => $profile['last_name'] ?? '',
+        'email' => $currentUser['email'] ?? '',
+        'role' => $currentUser['role'] ?? '',
+    ]);
+}
 
 if ($method !== 'PUT') {
     json_error('Method not allowed', 405);
 }
 
 $data = json_decode(file_get_contents('php://input'), true) ?? [];
-$currentUser = logged_in_user();
-$userId = (int)$currentUser['id'];
 
 $first_name = trim($data['first_name'] ?? '');
 $last_name = trim($data['last_name'] ?? '');

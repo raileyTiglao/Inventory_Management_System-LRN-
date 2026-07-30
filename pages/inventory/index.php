@@ -70,7 +70,7 @@ $canDelete = has_permission('Inventory', 'delete');
             <button type="button" id="filter-archived" onclick="setStatusFilter('archived')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Archived</button>
           </div>
         </div>
-        <div class="search-wrap w-64">
+        <div class="search-wrap w-full lg:w-64">
           <span class="search-icon"><?= icon('search', 'w-4 h-4') ?></span>
           <input type="text" id="inventory-search" placeholder="Search SKU or name..." class="search-input w-full">
         </div>
@@ -96,7 +96,18 @@ $canDelete = has_permission('Inventory', 'delete');
       </div>
 
       <div class="panel-footer">
-        <p class="text-xs text-ink-dim" id="inventory-count">Showing 0 of 0 items</p>
+        <div class="flex items-center gap-3">
+          <p class="text-xs text-ink-dim" id="inventory-count">Showing 0 of 0 items</p>
+          <div class="flex items-center gap-1.5">
+            <label for="inventory-page-size" class="text-xs text-ink-dim">Rows:</label>
+            <select id="inventory-page-size" onchange="changePageSize(this.value)" class="field-input !w-auto !py-1 !px-2 text-xs">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
         <div class="flex items-center gap-1.5">
           <button id="inventory-prev" onclick="changePage(-1)" class="pagination-btn" disabled>‹</button>
           <span class="pagination-page" id="inventory-page">1</span>
@@ -115,7 +126,7 @@ $canDelete = has_permission('Inventory', 'delete');
   const CAN_EDIT = <?= json_encode($canEdit) ?>;
   const CAN_DELETE = <?= json_encode($canDelete) ?>;
 
-  const state = { limit: 10, offset: 0, total: 0, items: [], statusFilter: 'active' };
+  const state = { limit: 10, offset: 0, total: 0, items: [], statusFilter: 'active', stats: { total_units: 0, total_value: 0, low_stock_count: 0 } };
 
   function esc(value) {
     return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -150,6 +161,7 @@ $canDelete = has_permission('Inventory', 'delete');
         sku_id: Number(item.sku_id),
       }));
       state.total = json.data.total || 0;
+      state.stats = json.data.stats || { total_units: 0, total_value: 0, low_stock_count: 0 };
 
       renderTable();
       renderStats();
@@ -187,8 +199,8 @@ $canDelete = has_permission('Inventory', 'delete');
       const actions = [];
       if (!archived) {
         if (CAN_EDIT) {
-          actions.push(`<button onclick="openMoveModal(${item.sku_id}, 'in')" class="icon-btn-success" title="Receive stock">${iconTrendUp()}</button>`);
-          actions.push(`<button onclick="openMoveModal(${item.sku_id}, 'out')" class="icon-btn-danger" title="Issue stock">${iconTrendDown()}</button>`);
+          actions.push(`<button onclick="openMoveModal(${item.sku_id}, 'in')" class="icon-btn-success" title="Receive stock">${iconStockIn()}</button>`);
+          actions.push(`<button onclick="openMoveModal(${item.sku_id}, 'out')" class="icon-btn-danger" title="Issue stock">${iconStockOut()}</button>`);
           actions.push(`<button onclick="openItemModal(${item.sku_id})" class="icon-btn-amber" title="Edit details">${iconEdit()}</button>`);
         }
         if (CAN_DELETE) {
@@ -219,15 +231,10 @@ $canDelete = has_permission('Inventory', 'delete');
   }
 
   function renderStats() {
-    const totalSkus = state.total;
-    const units = state.items.reduce((sum, i) => sum + Number(i.quantity_on_hand || 0), 0);
-    const value = state.items.reduce((sum, i) => sum + (Number(i.quantity_on_hand || 0) * Number(i.unit_cost || 0)), 0);
-    const lowStock = state.items.filter(i => Number(i.quantity_on_hand) <= Number(i.reorder_level)).length;
-
-    document.getElementById('stat-total-skus').textContent = totalSkus.toLocaleString();
-    document.getElementById('stat-stock-value').textContent = formatMoney(value);
-    document.getElementById('stat-units').textContent = units.toLocaleString();
-    document.getElementById('stat-low-stock').textContent = lowStock.toLocaleString();
+    document.getElementById('stat-total-skus').textContent = state.total.toLocaleString();
+    document.getElementById('stat-stock-value').textContent = formatMoney(state.stats.total_value);
+    document.getElementById('stat-units').textContent = state.stats.total_units.toLocaleString();
+    document.getElementById('stat-low-stock').textContent = state.stats.low_stock_count.toLocaleString();
   }
 
   function renderPagination() {
@@ -247,6 +254,12 @@ $canDelete = has_permission('Inventory', 'delete');
     loadInventory();
   }
 
+  function changePageSize(value) {
+    state.limit = Number(value);
+    state.offset = 0;
+    loadInventory();
+  }
+
   function setStatusFilter(status) {
     state.statusFilter = status;
     state.offset = 0;
@@ -254,9 +267,9 @@ $canDelete = has_permission('Inventory', 'delete');
     const activeBtn = document.getElementById('filter-active');
     const archivedBtn = document.getElementById('filter-archived');
     activeBtn.className = 'px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors ' +
-      (status === 'active' ? 'bg-tag-amber/10 text-tag-amber border border-tag-amber/30' : 'text-ink-dim hover:text-ink-muted');
+      (status === 'active' ? 'bg-tag-amber/10 text-tag-amber border border-tag-amber/30' : 'text-ink-dim hover:bg-overlay/10 hover:text-ink-muted');
     archivedBtn.className = 'px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors ' +
-      (status === 'archived' ? 'bg-tag-amber/10 text-tag-amber border border-tag-amber/30' : 'text-ink-dim hover:text-ink-muted');
+      (status === 'archived' ? 'bg-tag-amber/10 text-tag-amber border border-tag-amber/30' : 'text-ink-dim hover:bg-overlay/10 hover:text-ink-muted');
 
     loadInventory();
   }
@@ -273,11 +286,11 @@ $canDelete = has_permission('Inventory', 'delete');
   function iconRestore() {
     return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
   }
-  function iconTrendUp() {
-    return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/></svg>';
+  function iconStockIn() {
+    return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>';
   }
-  function iconTrendDown() {
-    return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6 4-4 8 8"/><path d="M21 17v-6h-6"/></svg>';
+  function iconStockOut() {
+    return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>';
   }
 
   // ---- Modal handling ----
@@ -378,6 +391,7 @@ $canDelete = has_permission('Inventory', 'delete');
       }
 
       closeItemModal();
+      showToast(id ? 'Item updated successfully.' : 'Item created successfully.', 'success');
       await loadInventory();
     } catch (err) {
       errorEl.textContent = 'Could not reach the server. Please try again.';
@@ -399,12 +413,13 @@ $canDelete = has_permission('Inventory', 'delete');
       });
       const json = await res.json();
       if (!json.success) {
-        alert(json.message || 'Could not update item.');
+        showToast(json.message || 'Could not update item.', 'error');
         return;
       }
+      showToast(status === 'archived' ? 'Item archived.' : 'Item restored.', 'success');
       await loadInventory();
     } catch (err) {
-      alert('Could not reach the server. Please try again.');
+      showToast('Could not reach the server. Please try again.', 'error');
     }
   }
 
@@ -423,12 +438,10 @@ $canDelete = has_permission('Inventory', 'delete');
   function setMoveType(type) {
     document.getElementById('move-type').value = type;
 
-    const inBtn = document.getElementById('move-type-in');
-    const outBtn = document.getElementById('move-type-out');
-    inBtn.className = 'flex-1 py-2 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors ' +
-      (type === 'in' ? 'bg-stock-in/15 text-stock-in border border-stock-in/30' : 'text-ink-dim hover:text-ink-muted');
-    outBtn.className = 'flex-1 py-2 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors ' +
-      (type === 'out' ? 'bg-stock-out/15 text-stock-out border border-stock-out/30' : 'text-ink-dim hover:text-ink-muted');
+    const badge = document.getElementById('move-type-badge');
+    badge.className = 'flex items-center gap-2 px-3 py-2.5 rounded-tag border text-xs font-mono uppercase tracking-wide ' +
+      (type === 'in' ? 'bg-stock-in/15 text-stock-in border-stock-in/30' : 'bg-stock-out/15 text-stock-out border-stock-out/30');
+    badge.innerHTML = (type === 'in' ? iconStockIn() : iconStockOut()) + '<span>' + (type === 'in' ? 'Receiving stock' : 'Issuing stock') + '</span>';
 
     const submitBtn = document.getElementById('movement-form-submit');
     submitBtn.textContent = type === 'in' ? 'Record receipt' : 'Record issue';
@@ -482,6 +495,7 @@ $canDelete = has_permission('Inventory', 'delete');
       }
 
       closeMoveModal();
+      showToast(payload.movement_type === 'in' ? 'Stock received successfully.' : 'Stock issued successfully.', 'success');
       await loadInventory();
     } catch (err) {
       errorEl.textContent = 'Could not reach the server. Please try again.';

@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $db = get_db();
+        $db = Connection::get_connecton();
 
         // Query user by email with role info
         $stmt = $db->prepare('

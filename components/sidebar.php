@@ -2,7 +2,7 @@
 $sidebarLowStockCount = 0;
 if (has_permission('Inventory', 'view')) {
     try {
-        $sidebarLowStockCount = (int)(get_db()->query("
+        $sidebarLowStockCount = (int)(Connection::get_connecton()->query("
             SELECT COUNT(*) AS c FROM dbo.ims_inventory WHERE status = 'active' AND quantity_on_hand <= reorder_level
         ")->fetch()['c'] ?? 0);
     } catch (Throwable $e) {
@@ -62,20 +62,12 @@ if (has_permission('Inventory', 'view')) {
             <?= icon('users', 'w-[18px] h-[18px] shrink-0') ?>
             <span class="sidebar-label">Users</span>
           </a>
-          <a href="<?= BASE_URL ?>/pages/roles/index.php" class="sidebar-link <?= is_active('roles') ?>">
-            <?= icon('shield', 'w-[18px] h-[18px] shrink-0') ?>
-            <span class="sidebar-label">Roles &amp; Permissions</span>
-          </a>
-        </div>
-      </div>
-
-      <div data-nav-group>
-        <p class="eyebrow px-3 mb-2 sidebar-label">System</p>
-        <div class="space-y-1">
-          <a href="<?= BASE_URL ?>/pages/settings.php" class="sidebar-link <?= is_active('settings') ?>">
-            <?= icon('settings', 'w-[18px] h-[18px] shrink-0') ?>
-            <span class="sidebar-label">Settings</span>
-          </a>
+          <?php if (is_admin()): ?>
+            <a href="<?= BASE_URL ?>/pages/roles/index.php" class="sidebar-link <?= is_active('roles') ?>">
+              <?= icon('shield', 'w-[18px] h-[18px] shrink-0') ?>
+              <span class="sidebar-label">Roles &amp; Permissions</span>
+            </a>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -87,7 +79,6 @@ if (has_permission('Inventory', 'view')) {
         src="<?= BASE_URL ?>/assets/icons/logo.png"
         alt="Powered by Information Technology"
         class="sidebar-brand-logo"
-        style="filter: invert(1);"
       >
     </div>
   </nav>
@@ -119,47 +110,6 @@ if (has_permission('Inventory', 'view')) {
   </div>
 </div>
 
-<script>
-(function () {
-  var STORAGE_KEY = 'ims-sidebar-collapsed';
-  var sidebar = document.getElementById('sidebar');
-  var toggle = document.getElementById('sidebar-toggle');
+<script src="<?= BASE_URL ?>/scripts/sidebar.js"></script>
 
-  if (localStorage.getItem(STORAGE_KEY) === '1') {
-    sidebar.classList.add('sidebar-collapsed');
-  }
-
-  toggle.addEventListener('click', function () {
-    var collapsed = sidebar.classList.toggle('sidebar-collapsed');
-    localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0');
-  });
-
-  var searchInput = document.getElementById('sidebar-nav-search');
-  var noResults = document.getElementById('sidebar-no-results');
-
-  searchInput.addEventListener('input', function () {
-    var q = searchInput.value.trim().toLowerCase();
-    var anyGroupVisible = false;
-
-    document.querySelectorAll('[data-nav-group]').forEach(function (group) {
-      var groupHasMatch = false;
-      group.querySelectorAll('.sidebar-link').forEach(function (link) {
-        var match = !q || link.textContent.toLowerCase().indexOf(q) !== -1;
-        link.classList.toggle('hidden', !match);
-        if (match) groupHasMatch = true;
-      });
-      group.classList.toggle('hidden', !groupHasMatch);
-      if (groupHasMatch) anyGroupVisible = true;
-    });
-
-    noResults.classList.toggle('hidden', anyGroupVisible || !q);
-  });
-})();
-
-function openSignOutModal() {
-  document.getElementById('signout-modal').classList.remove('hidden');
-}
-function closeSignOutModal() {
-  document.getElementById('signout-modal').classList.add('hidden');
-}
-</script>
+<?php include __DIR__ . '/toast.php'; ?>

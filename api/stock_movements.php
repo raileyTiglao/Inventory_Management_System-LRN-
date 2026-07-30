@@ -20,7 +20,7 @@ require_once __DIR__ . '/../utils/api.php';
 require_login();
 
 $method = $_SERVER['REQUEST_METHOD'];
-$db = get_db();
+$db = Connection::get_connecton();
 
 if ($method === 'GET') {
     require_permission('Inventory', 'view');

@@ -16,14 +16,16 @@ require_once __DIR__ . '/../utils/api.php';
 
 require_login();
 
-$db = get_db();
+$db = Connection::get_connecton();
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         json_error('Method not allowed', 405);
     }
 
-    require_permission('Roles & Permissions', 'view');
+    if (!is_admin()) {
+        json_error('Forbidden', 403);
+    }
 
     if (isset($_GET['role_id'])) {
         // Get permissions for a specific role

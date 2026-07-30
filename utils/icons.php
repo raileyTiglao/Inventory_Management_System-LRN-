@@ -20,13 +20,15 @@ function icon(string $name, string $class = 'w-5 h-5'): string
         'trash' => '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>',
         'chevron-down' => '<path d="M6 9l6 6 6-6"/>',
         'chevron-left' => '<path d="M15 6l-6 6 6 6"/>',
-        'trend-up' => '<path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/>',
-        'trend-down' => '<path d="M3 7l6 6 4-4 8 8"/><path d="M21 17v-6h-6"/>',
         'alert' => '<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/>',
         'package' => '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/>',
         'lock' => '<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>',
         'more' => '<circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>',
         'clock' => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+        'sun' => '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+        'moon' => '<path d="M20 14.5a8.5 8.5 0 11-8.5-10 6.5 6.5 0 008.5 10z"/>',
+        'plus-circle' => '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+        'minus-circle' => '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
     ];
 
     $path = $icons[$name] ?? '';

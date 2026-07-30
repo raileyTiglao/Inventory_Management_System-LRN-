@@ -12,5 +12,5 @@ Planned structure (mirrors the `dbo.ims_*` table names):
 Each endpoint will:
 1. `require auth/rbac.php` and call `require_permission($module, $action)`
 2. Read input (JSON body or `$_POST`)
-3. Use `connection/db.php`'s `get_db()` for parameterized PDO queries
+3. Use `connection/db.php`'s `Connection::get_connecton()` for parameterized PDO queries
 4. Return a JSON response with a consistent `{ success, data, message }` shape

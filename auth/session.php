@@ -20,3 +20,4 @@ function logged_in_user(): ?array
 {
     return $_SESSION['user'] ?? null;
 }
+    

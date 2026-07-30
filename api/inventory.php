@@ -2,7 +2,7 @@
 /**
  * /api/inventory.php
  * CRUD endpoint for inventory management.
- * 
+ 
  * GET  /api/inventory.php                  → list all inventory items
  * GET  /api/inventory.php?id=1             → get single item
  * POST /api/inventory.php                  → add new item
@@ -20,7 +20,7 @@ require_once __DIR__ . '/../utils/api.php';
 require_login();
 
 $method = $_SERVER['REQUEST_METHOD'];
-$db = get_db();
+$db = Connection::get_connecton();
 
 try {
     if ($method === 'GET') {
@@ -57,7 +57,10 @@ try {
 
             $stmt = $db->prepare("
                 SELECT *,
-                       COUNT(*) OVER() as total_count
+                       COUNT(*) OVER() as total_count,
+                       SUM(quantity_on_hand) OVER() as total_units,
+                       SUM(quantity_on_hand * ISNULL(unit_cost, 0)) OVER() as total_value,
+                       SUM(CASE WHEN quantity_on_hand <= reorder_level THEN 1 ELSE 0 END) OVER() as low_stock_count
                 FROM dbo.ims_inventory
                 $where
                 ORDER BY $orderBy
@@ -78,6 +81,11 @@ try {
                 'total' => $total,
                 'limit' => $limit,
                 'offset' => $offset,
+                'stats' => [
+                    'total_units' => (int)($items[0]['total_units'] ?? 0),
+                    'total_value' => (float)($items[0]['total_value'] ?? 0),
+                    'low_stock_count' => (int)($items[0]['low_stock_count'] ?? 0),
+                ],
             ]);
         }
     }
@@ -96,6 +104,10 @@ try {
 
         if (!$sku_code || !$name) {
             json_error('Missing required fields: sku_code, name', 400);
+        }
+
+        if ($quantity < 1) {
+            json_error('Initial quantity must be at least 1', 400);
         }
 
         // Check if SKU already exists

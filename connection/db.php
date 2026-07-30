@@ -1,27 +1,36 @@
 <?php
 
-function get_db(): PDO
-{
-    static $pdo = null;
+date_default_timezone_set('Asia/Manila');
 
-    if ($pdo === null) {
-        $serverName = "10.2.0.9";
-        $database = "LRNPH_OJT";  
+    class Connection {
+        private static $instance = null;
+        private $pdo;
 
-        try {
-            $conn = new PDO(
-                "sqlsrv:Server=$serverName;Database=$database;TrustServerCertificate=true"
-            );
+        private function __construct() 
+        {
+            $dsn = "sqlsrv:Server=" . '10.2.0.9'
+                . ";Database=" . 'LRNPH_OJT'
+                . ";TrustServerCertificate=1";
 
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-            
-            $pdo = $conn;
-        } catch (PDOException $e) {
-            error_log("Database Connection Error: " . $e->getMessage());
-            throw new Exception("Database Connection Failed: " . $e->getMessage());
+            $options = [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+                PDO::SQLSRV_ATTR_ENCODING    => PDO::SQLSRV_ENCODING_UTF8,
+            ];
+
+            $this->pdo = new PDO($dsn, 'rtiglao', 'Admin@007', $options);
         }
+
+        public static function get_connecton(): PDO 
+        {
+            if (self::$instance === null){
+                self::$instance = new self();
+            }
+            return self::$instance->pdo;
+        }
+
+
     }
 
-    return $pdo;
-}
+?>

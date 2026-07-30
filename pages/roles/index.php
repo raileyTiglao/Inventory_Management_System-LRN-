@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/../../auth/rbac.php';
 
 require_login();
-require_permission('Roles & Permissions', 'view');
+require_admin();
 
 $activePage = 'roles';
 $pageEyebrow = 'Access Control';
@@ -318,6 +318,7 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
         return;
       }
 
+      showToast('Permissions updated successfully.', 'success');
       await loadMatrix();
     } catch (err) {
       errorEl.textContent = 'Could not reach the server. Please try again.';
@@ -395,6 +396,7 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
       }
 
       closeRoleModal();
+      showToast(id ? 'Role updated successfully.' : 'Role created successfully.', 'success');
       await loadRoles();
       await loadMatrix();
     } catch (err) {
@@ -413,13 +415,14 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
       const res = await fetch(`${BASE_URL}/api/roles.php?id=${id}`, { method: 'DELETE' });
       const json = await res.json();
       if (!json.success) {
-        alert(json.message || 'Could not delete role.');
+        showToast(json.message || 'Could not delete role.', 'error');
         return;
       }
+      showToast('Role deleted successfully.', 'success');
       await loadRoles();
       await loadMatrix();
     } catch (err) {
-      alert('Could not reach the server. Please try again.');
+      showToast('Could not reach the server. Please try again.', 'error');
     }
   }
 

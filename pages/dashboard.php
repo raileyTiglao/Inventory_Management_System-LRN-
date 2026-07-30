@@ -9,7 +9,7 @@ $activePage = 'dashboard';
 $pageEyebrow = 'Overview';
 $pageTitle = 'Dashboard';
 
-$db = get_db();
+$db = Connection::get_connecton();
 
 // ---- Stat cards: live counts from dbo.ims_inventory / dbo.ims_users ----
 $invSummary = $db->query("
@@ -66,6 +66,35 @@ $lowStock = array_map(fn($row) => [
     'left' => (int)$row['quantity_on_hand'],
     'reorder' => (int)$row['reorder_level'],
 ], $lowStockRows);
+
+// ---- Stock trend: received vs issued quantity per day, last 14 days ----
+$trendRows = $db->query("
+    SELECT CAST(created_at AS DATE) AS day,
+           SUM(CASE WHEN movement_type = 'in' THEN quantity ELSE 0 END) AS qty_in,
+           SUM(CASE WHEN movement_type = 'out' THEN quantity ELSE 0 END) AS qty_out
+    FROM dbo.ims_stock_movements
+    WHERE created_at >= DATEADD(DAY, -13, CAST(GETUTCDATE() AS DATE))
+    GROUP BY CAST(created_at AS DATE)
+")->fetchAll();
+
+$trendByDay = [];
+foreach ($trendRows as $row) {
+    $day = date('Y-m-d', strtotime($row['day']));
+    $trendByDay[$day] = ['in' => (int)$row['qty_in'], 'out' => (int)$row['qty_out']];
+}
+
+$trend = [];
+for ($i = 13; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $trend[] = [
+        'date' => $date,
+        'label' => date('M j', strtotime($date)),
+        'in' => $trendByDay[$date]['in'] ?? 0,
+        'out' => $trendByDay[$date]['out'] ?? 0,
+    ];
+}
+
+$trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'out')));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -151,7 +180,7 @@ $lowStock = array_map(fn($row) => [
                 <p class="font-mono text-xs text-tag-amber"><?= e($item['left']) ?> left</p>
               </div>
               <p class="font-mono text-[11px] text-ink-dim mb-2"><?= e($item['sku']) ?></p>
-              <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div class="h-1.5 bg-overlay/10 rounded-full overflow-hidden">
                 <div class="h-full bg-tag-amber rounded-full" style="width: <?= $pct ?>%"></div>
               </div>
             </div>
@@ -159,8 +188,126 @@ $lowStock = array_map(fn($row) => [
         </div>
       </div>
     </div>
+
+    <!-- Stock trend: received vs issued, last 14 days -->
+    <div class="bin-tag">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Flow</p>
+          <h2 class="font-display font-semibold text-ink">Stock Trend</h2>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3 text-xs text-ink-muted">
+            <span class="flex items-center gap-1.5">
+              <?= icon('plus-circle', 'w-3.5 h-3.5 text-stock-in') ?> Received
+            </span>
+            <span class="flex items-center gap-1.5">
+              <?= icon('minus-circle', 'w-3.5 h-3.5 text-stock-out') ?> Issued
+            </span>
+          </div>
+          <button type="button" id="trend-table-toggle" class="text-xs text-tag-amber hover:underline">View as table</button>
+        </div>
+      </div>
+
+      <div class="p-5 relative">
+        <div id="trend-chart-wrap">
+          <?php if ($trendMax === 0): ?>
+            <p class="text-center text-sm text-ink-dim py-8">No stock movements recorded in the last 14 days.</p>
+          <?php else: ?>
+            <div id="trend-chart" class="flex items-stretch">
+              <?php foreach ($trend as $i => $day): ?>
+                <?php
+                  $inH = $day['in'] > 0 ? max(3, (int)round(($day['in'] / $trendMax) * 76)) : 0;
+                  $outH = $day['out'] > 0 ? max(3, (int)round(($day['out'] / $trendMax) * 76)) : 0;
+                  $showLabel = $i % 2 === 0;
+                ?>
+                <div class="trend-col flex-1 flex flex-col items-center cursor-default"
+                     data-label="<?= e($day['label']) ?>" data-in="<?= (int)$day['in'] ?>" data-out="<?= (int)$day['out'] ?>">
+                  <div class="h-20 w-full flex items-end justify-center">
+                    <div class="w-3.5 rounded-t-tag bg-stock-in" style="height: <?= $inH ?>px"></div>
+                  </div>
+                  <div class="h-px w-full bg-border"></div>
+                  <div class="h-20 w-full flex items-start justify-center">
+                    <div class="w-3.5 rounded-b-tag bg-stock-out" style="height: <?= $outH ?>px"></div>
+                  </div>
+                  <p class="text-[10px] text-ink-dim font-mono mt-2 h-3"><?= $showLabel ? e($day['label']) : '' ?></p>
+                </div>
+              <?php endforeach; ?>
+            </div>
+            <div id="trend-tooltip" class="hidden fixed z-50 bin-tag px-3 py-2 text-xs pointer-events-none"></div>
+          <?php endif; ?>
+        </div>
+
+        <table id="trend-table" class="data-table hidden mt-2">
+          <thead>
+            <tr>
+              <th class="text-left">Date</th>
+              <th class="text-right">Received</th>
+              <th class="text-right">Issued</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($trend as $day): ?>
+              <tr>
+                <td class="text-xs"><?= e($day['label']) ?></td>
+                <td class="text-right font-mono text-xs text-stock-in"><?= (int)$day['in'] ?></td>
+                <td class="text-right font-mono text-xs text-stock-out"><?= (int)$day['out'] ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </main>
 </div>
+
+<script>
+(function () {
+  const chart = document.getElementById('trend-chart');
+  const tooltip = document.getElementById('trend-tooltip');
+  const tableToggle = document.getElementById('trend-table-toggle');
+  const table = document.getElementById('trend-table');
+
+  if (chart && tooltip) {
+    chart.querySelectorAll('.trend-col').forEach((col) => {
+      col.addEventListener('mousemove', (e) => {
+        const label = col.dataset.label;
+        const qtyIn = col.dataset.in;
+        const qtyOut = col.dataset.out;
+
+        tooltip.innerHTML = '';
+        const title = document.createElement('p');
+        title.className = 'font-mono text-ink-dim mb-1';
+        title.textContent = label;
+        const inRow = document.createElement('p');
+        inRow.className = 'text-stock-in';
+        inRow.textContent = 'Received: ' + qtyIn;
+        const outRow = document.createElement('p');
+        outRow.className = 'text-stock-out';
+        outRow.textContent = 'Issued: ' + qtyOut;
+        tooltip.append(title, inRow, outRow);
+
+        tooltip.style.left = (e.clientX + 14) + 'px';
+        tooltip.style.top = (e.clientY + 14) + 'px';
+        tooltip.classList.remove('hidden');
+      });
+      col.addEventListener('mouseleave', () => {
+        tooltip.classList.add('hidden');
+      });
+    });
+  }
+
+  const chartWrap = document.getElementById('trend-chart-wrap');
+  if (tableToggle && table && chartWrap) {
+    tableToggle.addEventListener('click', () => {
+      const showingTable = !table.classList.contains('hidden');
+      table.classList.toggle('hidden', showingTable);
+      chartWrap.classList.toggle('hidden', !showingTable);
+      tableToggle.textContent = showingTable ? 'View as table' : 'View as chart';
+    });
+  }
+})();
+</script>
 
 </body>
 </html>

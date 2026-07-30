@@ -17,7 +17,7 @@ $currentUser = logged_in_user();
 
 // Queried directly (not via /api/roles.php) since roles the current user
 // can assign shouldn't require 'Roles & Permissions' view access.
-$roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY role_name')->fetchAll();
+$roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY role_name')->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,7 +50,7 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
         <div class="flex items-center gap-2">
           <p class="eyebrow">dbo.ims_users</p>
         </div>
-        <div class="search-wrap w-64">
+        <div class="search-wrap w-full lg:w-64">
           <span class="search-icon"><?= icon('search', 'w-4 h-4') ?></span>
           <input type="text" id="user-search" placeholder="Search users..." class="search-input w-full">
         </div>
@@ -76,7 +76,18 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
       </div>
 
       <div class="panel-footer">
-        <p class="text-xs text-ink-dim" id="user-count">Showing 0 of 0 users</p>
+        <div class="flex items-center gap-3">
+          <p class="text-xs text-ink-dim" id="user-count">Showing 0 of 0 users</p>
+          <div class="flex items-center gap-1.5">
+            <label for="user-page-size" class="text-xs text-ink-dim">Rows:</label>
+            <select id="user-page-size" onchange="changePageSize(this.value)" class="field-input !w-auto !py-1 !px-2 text-xs">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
         <div class="flex items-center gap-1.5">
           <button id="user-prev" onclick="changePage(-1)" class="pagination-btn" disabled>‹</button>
           <span class="pagination-page" id="user-page">1</span>
@@ -196,7 +207,7 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
           <td class="font-mono text-xs">USR-${String(u.user_id).padStart(4, '0')}</td>
           <td class="text-ink font-medium">
             <div class="flex items-center gap-2.5">
-              <div class="w-7 h-7 rounded-tag bg-white/5 border border-border-light flex items-center justify-center font-mono text-[11px] text-ink-muted">
+              <div class="w-7 h-7 rounded-tag bg-overlay/5 border border-border-light flex items-center justify-center font-mono text-[11px] text-ink-muted">
                 ${esc(initials(u.first_name, u.last_name))}
               </div>
               ${esc(name)}
@@ -230,6 +241,12 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
     loadUsers();
   }
 
+  function changePageSize(value) {
+    state.limit = Number(value);
+    state.offset = 0;
+    loadUsers();
+  }
+
   function iconEdit() {
     return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
   }
@@ -245,6 +262,7 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
     document.getElementById('user-id').value = '';
     document.getElementById('user-form-error').classList.add('hidden');
     document.getElementById('user-password').required = !id;
+    document.getElementById('user-password-required').classList.toggle('hidden', !!id);
     document.getElementById('user-password-hint').textContent = id
       ? 'Leave blank to keep the current password.'
       : 'Required for new accounts.';
@@ -331,6 +349,7 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
       }
 
       closeUserModal();
+      showToast(id ? 'User updated successfully.' : 'User created successfully.', 'success');
       await loadUsers();
     } catch (err) {
       errorEl.textContent = 'Could not reach the server. Please try again.';
@@ -348,12 +367,13 @@ $roles = get_db()->query('SELECT role_id, role_name FROM dbo.ims_roles ORDER BY 
       const res = await fetch(`${BASE_URL}/api/users.php?id=${id}`, { method: 'DELETE' });
       const json = await res.json();
       if (!json.success) {
-        alert(json.message || 'Could not delete user.');
+        showToast(json.message || 'Could not delete user.', 'error');
         return;
       }
+      showToast('User deleted successfully.', 'success');
       await loadUsers();
     } catch (err) {
-      alert('Could not reach the server. Please try again.');
+      showToast('Could not reach the server. Please try again.', 'error');
     }
   }
 

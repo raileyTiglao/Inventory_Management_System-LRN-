@@ -3,6 +3,48 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light theme (default). Values are space-separated RGB triplets so
+     Tailwind's opacity modifiers (bg-tag-amber/10) keep working. */
+  :root {
+    --color-base: 247 245 240;
+    --color-base-raised: 255 255 255;
+    --color-base-deep: 238 234 225;
+    --color-surface: 255 255 255;
+    --color-card: 255 255 255;
+    --color-border: 224 219 206;
+    --color-border-light: 209 201 182;
+    --color-ink: 30 33 38;
+    --color-ink-muted: 92 98 112;
+    --color-ink-dim: 150 145 130;
+    --color-tag-amber: 232 163 61;
+    --color-tag-amberdark: 184 122 34;
+    --color-stock-in: 79 157 105;
+    --color-stock-out: 217 83 79;
+    --color-stock-low: 217 167 46;
+    --color-overlay: 20 23 28;
+  }
+
+  /* Dark theme — the app's original (and only) palette, now opt-in via
+     data-theme="dark" on <html> instead of being the default. */
+  :root[data-theme="dark"] {
+    --color-base: 20 23 28;
+    --color-base-raised: 28 32 40;
+    --color-base-deep: 15 18 22;
+    --color-surface: 28 32 40;
+    --color-card: 36 41 51;
+    --color-border: 42 47 58;
+    --color-border-light: 52 59 71;
+    --color-ink: 232 230 223;
+    --color-ink-muted: 139 146 160;
+    --color-ink-dim: 92 98 112;
+    --color-tag-amber: 232 163 61;
+    --color-tag-amberdark: 184 122 34;
+    --color-stock-in: 79 157 105;
+    --color-stock-out: 217 83 79;
+    --color-stock-low: 217 167 46;
+    --color-overlay: 255 255 255;
+  }
+
   body {
     @apply bg-base text-ink font-body antialiased;
   }
@@ -32,7 +74,7 @@
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-tag text-sm text-ink-muted hover:bg-white/5 hover:text-ink transition-colors;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-tag text-sm text-ink-muted hover:bg-overlay/5 hover:text-ink transition-colors;
   }
   .sidebar-link.active {
     @apply bg-tag-amber/10 text-tag-amber border border-tag-amber/30;
@@ -74,13 +116,19 @@
     padding-top: 1.5rem;
     padding-bottom: 0.5rem;
   }
+  /* logo.png is black text on a transparent background — invert it to white
+     only in dark mode so it stays visible against the sidebar's background
+     in both themes instead of a filter baked in for one theme only. */
   .sidebar-brand-logo {
     @apply w-auto transition-opacity;
-    height: 2.75rem;
+    height: 5rem;
     opacity: 0.6;
   }
   .sidebar-brand-logo:hover {
     opacity: 1;
+  }
+  :root[data-theme="dark"] .sidebar-brand-logo {
+    filter: invert(1);
   }
 
   /* Notification dropdown, toggled by JS in components/topbar.php. */
@@ -96,7 +144,7 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-tag-amber text-base-deep font-semibold text-sm px-4 py-2.5 rounded-tag hover:bg-tag-amberdark transition-colors;
+    @apply inline-flex items-center justify-center gap-2 bg-tag-amber text-ink-onamber font-semibold text-sm px-4 py-2.5 rounded-tag hover:bg-tag-amberdark transition-colors;
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 bg-transparent border border-border-light text-ink text-sm px-4 py-2.5 rounded-tag hover:border-tag-amber/50 hover:text-tag-amber transition-colors;
@@ -111,35 +159,46 @@
   .badge-amber { @apply badge bg-tag-amber/10 text-tag-amber border-tag-amber/30; }
   .badge-green { @apply badge bg-stock-in/10 text-stock-in border-stock-in/30; }
   .badge-red { @apply badge bg-stock-out/10 text-stock-out border-stock-out/30; }
-  .badge-muted { @apply badge bg-white/5 text-ink-muted border-border-light; }
+  .badge-muted { @apply badge bg-overlay/5 text-ink-muted border-border-light; }
 
   .field-label {
     @apply block text-xs font-mono uppercase tracking-wide text-ink-dim mb-1.5;
+  }
+  .required-marker {
+    @apply text-stock-out;
   }
   .field-input {
     @apply w-full bg-base-deep border border-border rounded-tag px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-dim focus:outline-none focus:border-tag-amber/60 focus:ring-1 focus:ring-tag-amber/40 transition-colors;
   }
 
+  /* min-w keeps columns from ever being squeezed below a legible width —
+     without it, `w-full` caps the table at its container's width exactly,
+     so there's nothing left to overflow and the wrapping .overflow-x-auto
+     scrollbar has no distance to travel on narrow viewports (iPad-and-down). */
   .data-table {
-    @apply w-full text-sm;
+    @apply w-full min-w-[720px] text-sm;
   }
   /* No default text-align here — it must come from an explicit .text-left/
      .text-right/.text-center utility on each <th>, or its higher-specificity
      `thead th` selector silently wins over those utilities regardless of
      source order, which is what caused header/data column misalignment. */
   .data-table thead th {
-    @apply font-mono text-[11px] uppercase tracking-wider text-ink-dim border-b border-border py-3 px-4;
+    @apply font-mono text-[11px] uppercase tracking-wider text-ink-dim border-b border-border py-3 px-4 whitespace-nowrap;
   }
   .data-table tbody td {
-    @apply py-3.5 px-4 border-b border-border/60 text-ink-muted;
+    @apply py-3.5 px-4 border-b border-border/60 text-ink-muted whitespace-nowrap;
   }
   .data-table tbody tr:hover td {
-    @apply bg-white/[0.02] text-ink;
+    @apply bg-overlay/[0.03] text-ink;
   }
 
-  /* Header/footer strip used inside bin-tag panels and modals */
+  /* Header/footer strip used inside bin-tag panels and modals.
+     flex-wrap lets a fixed-width search box (or filter group) drop to its own
+     row on tablet-and-narrower viewports instead of forcing the whole card
+     wider than the page — that outer overflow was escaping the table's own
+     overflow-x-auto wrapper and making the page itself scroll sideways. */
   .panel-header {
-    @apply flex items-center justify-between px-5 py-4 border-b border-border;
+    @apply flex items-center justify-between flex-wrap gap-3 px-5 py-4 border-b border-border;
   }
   .panel-footer {
     @apply flex items-center justify-between px-5 py-3.5 border-t border-border;
@@ -163,14 +222,14 @@
   .icon-btn {
     @apply w-8 h-8 flex items-center justify-center rounded-tag text-ink-muted transition-colors;
   }
-  .icon-btn-amber { @apply icon-btn hover:bg-white/5 hover:text-tag-amber; }
+  .icon-btn-amber { @apply icon-btn hover:bg-overlay/10 hover:text-tag-amber; }
   .icon-btn-danger { @apply icon-btn hover:bg-stock-out/10 hover:text-stock-out; }
   .icon-btn-success { @apply icon-btn hover:bg-stock-in/10 hover:text-stock-in; }
-  .icon-btn-muted { @apply icon-btn hover:bg-white/5 hover:text-ink; }
+  .icon-btn-muted { @apply icon-btn hover:bg-overlay/10 hover:text-ink; }
 
   /* Table pagination controls */
   .pagination-btn {
-    @apply w-8 h-8 flex items-center justify-center rounded-tag border border-border text-ink-dim disabled:opacity-40;
+    @apply w-8 h-8 flex items-center justify-center rounded-tag border border-border text-ink-dim transition-colors hover:border-tag-amber/50 hover:text-tag-amber disabled:opacity-40 disabled:hover:border-border disabled:hover:text-ink-dim;
   }
   .pagination-btn-active {
     @apply w-8 h-8 flex items-center justify-center rounded-tag bg-tag-amber/10 border border-tag-amber/30 text-tag-amber font-mono text-xs;
@@ -252,5 +311,37 @@
   }
   .modal-footer {
     @apply flex items-center justify-end gap-3 pt-2;
+  }
+
+  /* Full-page error screens (403 today, any 404/500 later). Pairs with
+     .bin-tag on the card and reuses the login backdrop, so a blocked page
+     reads as part of the system rather than a raw server error. */
+  .error-body {
+    @apply text-center;
+    padding: 2.25rem 1.75rem 1.75rem;
+  }
+  .error-badge {
+    @apply inline-flex items-center justify-center rounded-tag bg-stock-out/10 border border-stock-out/30 text-stock-out;
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+  .error-badge svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .error-text {
+    @apply text-sm text-ink-muted;
+    margin-top: 0.5rem;
+    line-height: 1.625;
+  }
+  .error-meta {
+    @apply font-mono text-[11px] text-ink-dim border-t border-border;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+  }
+  .error-actions {
+    @apply flex items-center justify-center gap-3;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
   }
 }
