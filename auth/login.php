@@ -16,7 +16,7 @@ const LOGIN_LOCKOUT_SECONDS = 10;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lockedUntil = $_SESSION['login_locked_until'] ?? 0;
     if ($lockedUntil > time()) {
-        header('Location: ' . BASE_URL . '/pages/login.php?error=locked');
+        header('Location: ' . BASE_URL . '/pages/login/index.php?error=locked');
         exit;
     }
 
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     if (empty($email) || empty($password)) {
-        header('Location: ' . BASE_URL . '/pages/login.php?error=invalid');
+        header('Location: ' . BASE_URL . '/pages/login/index.php?error=invalid');
         exit;
     }
 
@@ -44,18 +44,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$user) {
             register_failed_login_attempt();
-            header('Location: ' . BASE_URL . '/pages/login.php?error=invalid');
+            header('Location: ' . BASE_URL . '/pages/login/index.php?error=invalid');
             exit;
         }
 
         if ($user['status'] !== 'active') {
-            header('Location: ' . BASE_URL . '/pages/login.php?error=inactive');
+            header('Location: ' . BASE_URL . '/pages/login/index.php?error=inactive');
             exit;
         }
 
         if (!password_verify($password, $user['password_hash'])) {
             register_failed_login_attempt();
-            header('Location: ' . BASE_URL . '/pages/login.php?error=invalid');
+            header('Location: ' . BASE_URL . '/pages/login/index.php?error=invalid');
             exit;
         }
 
@@ -76,12 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update = $db->prepare('UPDATE dbo.ims_users SET last_login = GETUTCDATE() WHERE user_id = ?');
         $update->execute([$user['user_id']]);
 
-        header('Location: ' . BASE_URL . '/pages/dashboard.php');
+        header('Location: ' . BASE_URL . '/pages/dashboard/index.php');
         exit;
 
     } catch (Exception $e) {
         error_log("Login error: " . $e->getMessage());
-        header('Location: ' . BASE_URL . '/pages/login.php?error=server');
+        header('Location: ' . BASE_URL . '/pages/login/index.php?error=server');
         exit;
     }
 }
@@ -95,5 +95,5 @@ function register_failed_login_attempt(): void
     }
 }
 
-header('Location: ' . BASE_URL . '/pages/login.php');
+header('Location: ' . BASE_URL . '/pages/login/index.php');
 exit;

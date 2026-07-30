@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
-require_once __DIR__ . '/../auth/rbac.php';
+require_once __DIR__ . '/../../bootstrap.php';
+require_once __DIR__ . '/../../auth/rbac.php';
 
 require_login();
 require_permission('Dashboard', 'view');
@@ -99,14 +99,14 @@ $trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'ou
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<?php include __DIR__ . '/../components/head.php'; ?>
+<?php include __DIR__ . '/../../components/head.php'; ?>
 </head>
 <body class="flex min-h-screen">
 
-<?php include __DIR__ . '/../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/sidebar.php'; ?>
 
 <div class="flex-1 flex flex-col min-w-0">
-  <?php include __DIR__ . '/../components/topbar.php'; ?>
+  <?php include __DIR__ . '/../../components/topbar.php'; ?>
 
   <main class="flex-1 p-6 space-y-6">
 
@@ -135,7 +135,7 @@ $trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'ou
             <p class="eyebrow">Ledger</p>
             <h2 class="font-display font-semibold text-ink">Recent Activity</h2>
           </div>
-          <a href="<?= BASE_URL ?>/pages/activity-log.php" class="text-xs text-tag-amber hover:underline">View full log</a>
+          <a href="<?= BASE_URL ?>/pages/activity-log/index.php" class="text-xs text-tag-amber hover:underline">View full log</a>
         </div>
         <div class="divide-y divide-border/60">
           <?php if (empty($activity)): ?>

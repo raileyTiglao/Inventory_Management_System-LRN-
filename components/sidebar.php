@@ -37,7 +37,7 @@ if (has_permission('Inventory', 'view')) {
       <div data-nav-group>
         <p class="eyebrow px-3 mb-2 sidebar-label">Overview</p>
         <div class="space-y-1">
-          <a href="<?= BASE_URL ?>/pages/dashboard.php" class="sidebar-link <?= is_active('dashboard') ?>">
+          <a href="<?= BASE_URL ?>/pages/dashboard/index.php" class="sidebar-link <?= is_active('dashboard') ?>">
             <?= icon('grid', 'w-[18px] h-[18px] shrink-0') ?>
             <span class="sidebar-label">Dashboard</span>
           </a>
@@ -48,7 +48,7 @@ if (has_permission('Inventory', 'view')) {
               <span class="sidebar-badge sidebar-label" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"><?= $sidebarLowStockCount ?></span>
             <?php endif; ?>
           </a>
-          <a href="<?= BASE_URL ?>/pages/activity-log.php" class="sidebar-link <?= is_active('activity-log') ?>">
+          <a href="<?= BASE_URL ?>/pages/activity-log/index.php" class="sidebar-link <?= is_active('activity-log') ?>">
             <?= icon('clock', 'w-[18px] h-[18px] shrink-0') ?>
             <span class="sidebar-label">Activity Log</span>
           </a>

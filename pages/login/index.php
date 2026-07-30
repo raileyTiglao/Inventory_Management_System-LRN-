@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../../bootstrap.php';
 $pageTitle = 'Sign In';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<?php include __DIR__ . '/../components/head.php'; ?>
+<?php include __DIR__ . '/../../components/head.php'; ?>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-base p-4 relative overflow-hidden">
 

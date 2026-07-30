@@ -49,7 +49,7 @@ $user = logged_in_user();
 
         <div class="error-actions">
           <?php if ($user): ?>
-            <a href="<?= BASE_URL ?>/pages/dashboard.php" class="btn-primary">
+            <a href="<?= BASE_URL ?>/pages/dashboard/index.php" class="btn-primary">
               <?= icon('grid', 'w-4 h-4') ?>
               Back to Dashboard
             </a>
@@ -58,7 +58,7 @@ $user = logged_in_user();
               Go back
             </button>
           <?php else: ?>
-            <a href="<?= BASE_URL ?>/pages/login.php" class="btn-primary">
+            <a href="<?= BASE_URL ?>/pages/login/index.php" class="btn-primary">
               <?= icon('lock', 'w-4 h-4') ?>
               Sign in
             </a>
