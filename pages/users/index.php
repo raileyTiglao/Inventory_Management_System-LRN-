@@ -48,7 +48,7 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
     <div class="bin-tag">
       <div class="panel-header">
         <div class="flex items-center gap-2">
-          <p class="eyebrow-table">users</p>
+          <p class="eyebrow-table">USERS</p>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
           <select id="user-role-filter" class="field-input !py-2 !w-40 text-xs">
@@ -69,12 +69,12 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
           <thead>
             <tr>
               <th class="text-left">ID</th>
-              <th class="text-left">Name</th>
-              <th class="text-left">Email</th>
-              <th class="text-left">Role</th>
-              <th class="text-left">Status</th>
-              <th class="text-left">Last active</th>
-              <th class="text-right">Actions</th>
+              <th class="text-left">NAME</th>
+              <th class="text-left">EMAIL</th>
+              <th class="text-left">ROLE</th>
+              <th class="text-left">STATUS</th>
+              <th class="text-left">LAST ACTIVE</th>
+              <th class="text-right">ACTIONS</th>
             </tr>
           </thead>
           <tbody id="user-tbody">

@@ -49,7 +49,7 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
     <!-- Permission matrix -->
     <div class="bin-tag">
       <div class="px-5 py-4 border-b border-border">
-        <h2 class="eyebrow-table">Permission Matrix</h2>
+        <h2 class="eyebrow-table">PERMISSION MATRIX</h2>
       </div>
 
       <div class="overflow-x-auto">
@@ -227,14 +227,21 @@ $canDelete = has_permission('Roles & Permissions', 'delete');
         return;
       }
 
-      modules = Object.keys(permsJson.data.permissions).map(name => {
-        const byAction = {};
-        permsJson.data.permissions[name].forEach(p => { byAction[p.action] = p.permission_id; });
-        const ordered = ACTION_ORDER
-          .filter(a => byAction[a] !== undefined)
-          .map(a => ({ action: a, permission_id: byAction[a] }));
-        return { name, permissions: ordered };
-      });
+      // Dashboard is view-only and ungated (everyone can see it, no actions
+      // to grant), and Settings was removed in favor of the account modal —
+      // neither belongs in the matrix admins actually need to configure.
+      const HIDDEN_MODULES = ['Dashboard', 'Settings'];
+
+      modules = Object.keys(permsJson.data.permissions)
+        .filter(name => !HIDDEN_MODULES.includes(name))
+        .map(name => {
+          const byAction = {};
+          permsJson.data.permissions[name].forEach(p => { byAction[p.action] = p.permission_id; });
+          const ordered = ACTION_ORDER
+            .filter(a => byAction[a] !== undefined)
+            .map(a => ({ action: a, permission_id: byAction[a] }));
+          return { name, permissions: ordered };
+        });
 
       assignedByRole = {};
       for (let i = 0; i < roles.length; i++) {

@@ -57,8 +57,11 @@ module.exports = {
         overlay: withOpacity("--color-overlay"),
       },
       fontFamily: {
-        display: ["'Space Grotesk'", "sans-serif"],
-        body: ["'Inter'", "sans-serif"],
+        // System sans-serif stack — no webfont request, renders in each OS's
+        // native UI font (San Francisco on macOS/iOS, Segoe UI on Windows,
+        // Roboto on Android, matching this app's own body font there too).
+        display: ["-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "Helvetica", "Arial", "sans-serif"],
+        body: ["'Roboto'", "sans-serif"],
         mono: ["'JetBrains Mono'", "monospace"],
       },
       borderRadius: {

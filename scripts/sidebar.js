@@ -50,3 +50,28 @@ function openSignOutModal() {
 function closeSignOutModal() {
   document.getElementById('signout-modal').classList.add('hidden');
 }
+
+// Called by pages that change inventory quantities/status (item save,
+// archive/restore, stock movements) so the nav badge updates immediately
+// instead of only reflecting reality after the next full page load.
+window.refreshSidebarLowStock = async function () {
+  var config = window.IMS_SIDEBAR_CONFIG;
+  var badge = document.getElementById('sidebar-low-stock-badge');
+  var dot = document.getElementById('sidebar-low-stock-dot');
+  if (!config || !config.canViewInventory || !badge || !dot) return;
+
+  try {
+    const res = await fetch(config.baseUrl + '/api/inventory.php?status=active&low_stock=1&limit=1');
+    const json = await res.json();
+    const count = (json.success && json.data.total) || 0;
+    const title = count + ' item(s) at or below reorder level';
+
+    badge.textContent = count;
+    badge.title = title;
+    dot.title = title;
+    badge.classList.toggle('hidden', count === 0);
+    dot.classList.toggle('hidden', count === 0);
+  } catch (err) {
+    // Leave the last-known badge state in place on failure.
+  }
+};

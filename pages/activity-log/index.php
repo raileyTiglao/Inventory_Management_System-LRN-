@@ -30,7 +30,7 @@ $pageTitle = 'Activity Log';
     <div class="bin-tag">
       <div class="panel-header">
         <div class="flex items-center gap-4">
-          <p class="eyebrow-table">stock movements</p>
+          <p class="eyebrow-table">STOCK MOVEMENTS</p>
           <div class="flex items-center gap-1.5 p-1 bg-base-deep border border-border rounded-tag">
             <button type="button" id="filter-all" onclick="setTypeFilter('')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">All</button>
             <button type="button" id="filter-in" onclick="setTypeFilter('in')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Received</button>
@@ -47,12 +47,12 @@ $pageTitle = 'Activity Log';
         <table class="data-table">
           <thead>
             <tr>
-              <th class="text-left">Date</th>
-              <th class="text-left">Item</th>
-              <th class="text-left">Type</th>
-              <th class="text-right">Quantity</th>
-              <th class="text-left">User</th>
-              <th class="text-left">Reference</th>
+              <th class="text-left">DATE</th>
+              <th class="text-left">ITEM</th>
+              <th class="text-left">TYPE</th>
+              <th class="text-right">QUANTITY</th>
+              <th class="text-left">USER</th>
+              <th class="text-left">REFERENCE</th>
             </tr>
           </thead>
           <tbody id="log-tbody">

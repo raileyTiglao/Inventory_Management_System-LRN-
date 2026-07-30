@@ -1,6 +1,7 @@
 <?php
+$sidebarCanViewInventory = has_permission('Inventory', 'view');
 $sidebarLowStockCount = 0;
-if (has_permission('Inventory', 'view')) {
+if ($sidebarCanViewInventory) {
     try {
         $sidebarLowStockCount = (int)(Connection::get_connecton()->query("
             SELECT COUNT(*) AS c FROM dbo.ims_inventory WHERE status = 'active' AND quantity_on_hand <= reorder_level
@@ -45,14 +46,10 @@ if (has_permission('Inventory', 'view')) {
           <a href="<?= BASE_URL ?>/pages/inventory/index.php" class="sidebar-link <?= is_active('inventory') ?>">
             <span class="relative shrink-0">
               <?= icon('package', 'w-[18px] h-[18px]') ?>
-              <?php if ($sidebarLowStockCount > 0): ?>
-                <span class="sidebar-collapsed-dot" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"></span>
-              <?php endif; ?>
+              <span id="sidebar-low-stock-dot" class="sidebar-collapsed-dot <?= $sidebarLowStockCount > 0 ? '' : 'hidden' ?>" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"></span>
             </span>
             <span class="sidebar-label flex-1">Inventory</span>
-            <?php if ($sidebarLowStockCount > 0): ?>
-              <span class="sidebar-badge sidebar-label" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"><?= $sidebarLowStockCount ?></span>
-            <?php endif; ?>
+            <span id="sidebar-low-stock-badge" class="sidebar-badge sidebar-label <?= $sidebarLowStockCount > 0 ? '' : 'hidden' ?>" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"><?= $sidebarLowStockCount ?></span>
           </a>
           <a href="<?= BASE_URL ?>/pages/activity-log/index.php" class="sidebar-link <?= is_active('activity-log') ?>">
             <?= icon('clock', 'w-[18px] h-[18px] shrink-0') ?>
@@ -116,6 +113,12 @@ if (has_permission('Inventory', 'view')) {
   </div>
 </div>
 
+<script>
+  window.IMS_SIDEBAR_CONFIG = {
+    baseUrl: <?= json_encode(BASE_URL) ?>,
+    canViewInventory: <?= json_encode($sidebarCanViewInventory) ?>,
+  };
+</script>
 <script src="<?= BASE_URL ?>/scripts/sidebar.js"></script>
 
 <?php include __DIR__ . '/toast.php'; ?>

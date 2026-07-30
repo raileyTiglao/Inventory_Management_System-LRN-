@@ -64,7 +64,7 @@ $canDelete = has_permission('Inventory', 'delete');
     <div class="bin-tag">
       <div class="panel-header">
         <div class="flex items-center gap-4">
-          <p class="eyebrow-table">inventory</p>
+          <p class="eyebrow-table">INVENTORY</p>
           <div class="flex items-center gap-1.5 p-1 bg-base-deep border border-border rounded-tag">
             <button type="button" id="filter-active" onclick="setStatusFilter('active')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Active</button>
             <button type="button" id="filter-archived" onclick="setStatusFilter('archived')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Archived</button>
@@ -81,12 +81,12 @@ $canDelete = has_permission('Inventory', 'delete');
           <thead>
             <tr>
               <th class="text-left">SKU</th>
-              <th class="text-left">Name</th>
-              <th class="text-right">Qty on hand</th>
-              <th class="text-right">Reorder level</th>
-              <th class="text-right">Unit cost</th>
-              <th class="text-left">Status</th>
-              <th class="text-right">Actions</th>
+              <th class="text-left">NAME</th>
+              <th class="text-right">QUANTITY</th>
+              <th class="text-right">REORDER LEVEL</th>
+              <th class="text-right">UNIT COST</th>
+              <th class="text-left">STATUS</th>
+              <th class="text-right">ACTIONS</th>
             </tr>
           </thead>
           <tbody id="inventory-tbody">
@@ -394,6 +394,7 @@ $canDelete = has_permission('Inventory', 'delete');
       closeItemModal();
       showToast(id ? 'Item updated successfully.' : 'Item created successfully.', 'success');
       await loadInventory();
+      if (typeof refreshSidebarLowStock === 'function') refreshSidebarLowStock();
     } catch (err) {
       errorEl.textContent = 'Could not reach the server. Please try again.';
       errorEl.classList.remove('hidden');
@@ -417,6 +418,7 @@ $canDelete = has_permission('Inventory', 'delete');
       }
       showToast(status === 'archived' ? 'Item archived.' : 'Item restored.', 'success');
       await loadInventory();
+      if (typeof refreshSidebarLowStock === 'function') refreshSidebarLowStock();
     } catch (err) {
       showToast('Could not reach the server. Please try again.', 'error');
     }
@@ -511,6 +513,7 @@ $canDelete = has_permission('Inventory', 'delete');
       closeMoveModal();
       showToast(payload.movement_type === 'in' ? 'Stock received successfully.' : 'Stock issued successfully.', 'success');
       await loadInventory();
+      if (typeof refreshSidebarLowStock === 'function') refreshSidebarLowStock();
     } catch (err) {
       errorEl.textContent = 'Could not reach the server. Please try again.';
       errorEl.classList.remove('hidden');

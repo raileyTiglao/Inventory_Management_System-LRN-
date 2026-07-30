@@ -72,10 +72,11 @@
   .eyebrow {
     @apply font-mono text-[11px] uppercase tracking-[0.18em] text-ink-dim;
   }
-  /* Table-name eyebrow (panel-header labels like "users", "inventory") —
-     lighter and larger than the standard dim eyebrow so it reads as a title. */
+  /* Table-name title (panel-header labels like "users", "inventory") — plain
+     body font instead of the mono/eyebrow treatment, reads as a title via
+     size/color alone. */
   .eyebrow-table {
-    @apply eyebrow text-xl text-ink;
+    @apply font-body text-xl text-ink;
   }
 
   .sidebar-link {
@@ -206,7 +207,7 @@
      `thead th` selector silently wins over those utilities regardless of
      source order, which is what caused header/data column misalignment. */
   .data-table thead th {
-    @apply font-mono text-[11px] uppercase tracking-wider text-ink-muted border-b border-border py-3 px-4 whitespace-nowrap;
+    @apply font-body text-xs text-ink-muted border-b border-border py-3 px-4 whitespace-nowrap;
   }
   .data-table tbody td {
     @apply py-3.5 px-4 border-b border-border/60 text-ink-muted whitespace-nowrap;
