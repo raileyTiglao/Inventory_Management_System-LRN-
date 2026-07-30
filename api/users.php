@@ -49,14 +49,20 @@ try {
             $limit = (int)($_GET['limit'] ?? 50);
             $offset = (int)($_GET['offset'] ?? 0);
             $search = trim($_GET['q'] ?? '');
+            $roleId = (int)($_GET['role_id'] ?? 0);
 
-            $where = '';
-            $likeParams = [];
+            $conditions = [];
+            $params = [];
             if ($search !== '') {
-                $where = 'WHERE u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR (u.first_name + \' \' + u.last_name) LIKE ?';
+                $conditions[] = '(u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR (u.first_name + \' \' + u.last_name) LIKE ?)';
                 $like = '%' . str_replace(['%', '_'], ['[%]', '[_]'], $search) . '%';
-                $likeParams = [$like, $like, $like, $like];
+                array_push($params, $like, $like, $like, $like);
             }
+            if ($roleId > 0) {
+                $conditions[] = 'u.role_id = ?';
+                $params[] = $roleId;
+            }
+            $where = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
 
             $stmt = $db->prepare("
                 SELECT u.user_id, u.email, u.first_name, u.last_name, u.status,
@@ -65,12 +71,12 @@ try {
                 FROM dbo.ims_users u
                 JOIN dbo.ims_roles r ON u.role_id = r.role_id
                 $where
-                ORDER BY u.created_at DESC
+                ORDER BY r.role_name, u.created_at DESC
                 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
             ");
             $paramIndex = 1;
-            foreach ($likeParams as $p) {
-                $stmt->bindValue($paramIndex++, $p, PDO::PARAM_STR);
+            foreach ($params as $p) {
+                $stmt->bindValue($paramIndex++, $p, is_int($p) ? PDO::PARAM_INT : PDO::PARAM_STR);
             }
             $stmt->bindValue($paramIndex++, $offset, PDO::PARAM_INT);
             $stmt->bindValue($paramIndex++, $limit, PDO::PARAM_INT);

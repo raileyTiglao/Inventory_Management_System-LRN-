@@ -30,7 +30,7 @@ $pageTitle = 'Activity Log';
     <div class="bin-tag">
       <div class="panel-header">
         <div class="flex items-center gap-4">
-          <p class="eyebrow">dbo.ims_stock_movements</p>
+          <p class="eyebrow-table">stock movements</p>
           <div class="flex items-center gap-1.5 p-1 bg-base-deep border border-border rounded-tag">
             <button type="button" id="filter-all" onclick="setTypeFilter('')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">All</button>
             <button type="button" id="filter-in" onclick="setTypeFilter('in')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Received</button>

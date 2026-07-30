@@ -72,6 +72,11 @@
   .eyebrow {
     @apply font-mono text-[11px] uppercase tracking-[0.18em] text-ink-dim;
   }
+  /* Table-name eyebrow (panel-header labels like "users", "inventory") —
+     lighter and larger than the standard dim eyebrow so it reads as a title. */
+  .eyebrow-table {
+    @apply eyebrow text-xl text-ink;
+  }
 
   .sidebar-link {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-tag text-sm text-ink-muted hover:bg-overlay/5 hover:text-ink transition-colors;
@@ -183,7 +188,7 @@
      `thead th` selector silently wins over those utilities regardless of
      source order, which is what caused header/data column misalignment. */
   .data-table thead th {
-    @apply font-mono text-[11px] uppercase tracking-wider text-ink-dim border-b border-border py-3 px-4 whitespace-nowrap;
+    @apply font-mono text-[11px] uppercase tracking-wider text-ink-muted border-b border-border py-3 px-4 whitespace-nowrap;
   }
   .data-table tbody td {
     @apply py-3.5 px-4 border-b border-border/60 text-ink-muted whitespace-nowrap;
@@ -229,7 +234,18 @@
 
   /* Table pagination controls */
   .pagination-btn {
-    @apply w-8 h-8 flex items-center justify-center rounded-tag border border-border text-ink-dim transition-colors hover:border-tag-amber/50 hover:text-tag-amber disabled:opacity-40 disabled:hover:border-border disabled:hover:text-ink-dim;
+    @apply w-8 h-8 flex items-center justify-center rounded-tag border border-border text-ink-dim disabled:opacity-40;
+    transition-property: color, background-color, border-color, transform;
+    transition-duration: 150ms;
+    transition-timing-function: ease-in-out;
+  }
+  .pagination-btn:hover:not(:disabled) {
+    @apply text-tag-amber;
+    border-color: rgba(232, 163, 61, 0.5);
+    transform: scale(1.08);
+  }
+  .pagination-btn:active:not(:disabled) {
+    transform: scale(0.96);
   }
   .pagination-btn-active {
     @apply w-8 h-8 flex items-center justify-center rounded-tag bg-tag-amber/10 border border-tag-amber/30 text-tag-amber font-mono text-xs;

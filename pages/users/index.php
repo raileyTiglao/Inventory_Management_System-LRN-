@@ -48,11 +48,19 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
     <div class="bin-tag">
       <div class="panel-header">
         <div class="flex items-center gap-2">
-          <p class="eyebrow">dbo.ims_users</p>
+          <p class="eyebrow-table">users</p>
         </div>
-        <div class="search-wrap w-full lg:w-64">
-          <span class="search-icon"><?= icon('search', 'w-4 h-4') ?></span>
-          <input type="text" id="user-search" placeholder="Search users..." class="search-input w-full">
+        <div class="flex items-center gap-3 flex-wrap">
+          <select id="user-role-filter" class="field-input !py-2 !w-40 text-xs">
+            <option value="">All roles</option>
+            <?php foreach ($roles as $role): ?>
+              <option value="<?= (int)$role['role_id'] ?>"><?= e($role['role_name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <div class="search-wrap flex-1 min-w-[160px] lg:w-64 lg:flex-none">
+            <span class="search-icon"><?= icon('search', 'w-4 h-4') ?></span>
+            <input type="text" id="user-search" placeholder="Search users..." class="search-input w-full">
+          </div>
         </div>
       </div>
 
@@ -106,7 +114,7 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
   const CAN_DELETE = <?= json_encode($canDelete) ?>;
   const CURRENT_USER_ID = <?= json_encode((int)($currentUser['id'] ?? 0)) ?>;
 
-  const state = { limit: 10, offset: 0, total: 0, users: [], search: '' };
+  const state = { limit: 10, offset: 0, total: 0, users: [], search: '', roleId: '' };
 
   function esc(value) {
     return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -149,7 +157,7 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
     tbody.innerHTML = '<tr><td colspan="7" class="text-center text-ink-dim py-8">Loading users…</td></tr>';
 
     try {
-      const res = await fetch(`${BASE_URL}/api/users.php?limit=${state.limit}&offset=${state.offset}&q=${encodeURIComponent(state.search)}`);
+      const res = await fetch(`${BASE_URL}/api/users.php?limit=${state.limit}&offset=${state.offset}&q=${encodeURIComponent(state.search)}&role_id=${encodeURIComponent(state.roleId)}`);
       const json = await res.json();
 
       if (!json.success) {
@@ -385,6 +393,12 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
       state.offset = 0;
       loadUsers();
     }, 250);
+  });
+
+  document.getElementById('user-role-filter').addEventListener('change', (e) => {
+    state.roleId = e.target.value;
+    state.offset = 0;
+    loadUsers();
   });
 
   loadUsers();

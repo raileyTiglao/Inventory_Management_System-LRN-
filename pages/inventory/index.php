@@ -64,7 +64,7 @@ $canDelete = has_permission('Inventory', 'delete');
     <div class="bin-tag">
       <div class="panel-header">
         <div class="flex items-center gap-4">
-          <p class="eyebrow">dbo.ims_inventory</p>
+          <p class="eyebrow-table">inventory</p>
           <div class="flex items-center gap-1.5 p-1 bg-base-deep border border-border rounded-tag">
             <button type="button" id="filter-active" onclick="setStatusFilter('active')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Active</button>
             <button type="button" id="filter-archived" onclick="setStatusFilter('archived')" class="px-3 py-1.5 rounded-tag text-xs font-mono uppercase tracking-wide transition-colors">Archived</button>
