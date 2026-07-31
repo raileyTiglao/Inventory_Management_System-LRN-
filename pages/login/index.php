@@ -7,78 +7,68 @@ $pageTitle = 'Sign In';
 <head>
 <?php include __DIR__ . '/../../components/head.php'; ?>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-base p-4 relative overflow-hidden">
+<body class="min-h-screen flex items-center justify-center bg-base p-4 md:p-8">
 
-  <!-- ambient decorative backdrop: blueprint grid, amber glow, and oversized
-       watermark icons echoing the bin-tag warehouse motif -->
-  <div class="login-backdrop" aria-hidden="true"></div>
-  <div class="login-watermark login-watermark-tl" aria-hidden="true">
-    <?= icon('package', 'login-watermark-icon') ?>
-  </div>
-  <div class="login-watermark login-watermark-br" aria-hidden="true">
-    <?= icon('grid', 'login-watermark-icon') ?>
-  </div>
+  <div class="w-full max-w-6xl">
+    <div class="auth-card">
 
-  <!-- ambient perforation stripe, echoing the bin-tag signature -->
-  <div class="absolute inset-x-0 bottom-0 h-1 bg-perf-h"></div>
-
-  <div class="w-full max-w-md relative z-10">
-    <div class="flex items-center justify-center gap-2.5 mb-8">
-      <img src="<?= BASE_URL ?>/assets/icons/logo.svg" alt="" class="w-9 h-9">
-      <div class="leading-tight">
-        <p class="font-display font-semibold text-xl text-ink">IMS</p>
-        <p class="eyebrow -mt-1">Inventory System</p>
-      </div>
-    </div>
-
-    <div class="bin-tag bin-tag-notch">
-      <div class="px-7 pt-7 pb-2">
-        <p class="eyebrow">USR · Sign In</p>
-        <h1 class="font-display font-semibold text-2xl text-ink mt-1">Welcome back</h1>
-        <p class="text-sm text-ink-muted mt-1.5">Sign in with your work account to continue.</p>
+      <!-- Left: reserved entirely for the three.js animation, which mounts
+           into #login-3d-bg. The blueprint grid sits behind it so the panel
+           isn't blank before the animation is wired in. -->
+      <div class="auth-visual" aria-hidden="true">
+        <div class="login-backdrop"></div>
+        <div id="login-3d-bg" class="auth-visual-canvas"></div>
       </div>
 
-      <?php
-        $error = $_GET['error'] ?? '';
-        $messages = [
-            'invalid' => 'Invalid email or password.',
-            'inactive' => 'Your account has been deactivated.',
-            'server' => 'Server error. Please try again later.',
-            'locked' => 'Too many failed attempts. Please wait a moment and try again.',
-        ];
-        if ($error && isset($messages[$error])): ?>
-          <div class="px-7 pt-4 pb-0">
-            <div class="p-3 rounded-tag bg-stock-out/10 border border-stock-out/30 flex items-start gap-2">
-              <?= icon('alert', 'w-4 h-4 text-stock-out shrink-0 mt-0.5') ?>
-              <p class="text-sm text-stock-out"><?= e($messages[$error]) ?></p>
+      <!-- Right: sign-in form -->
+      <div class="auth-form-side">
+        <div class="auth-brand">
+          <img src="<?= BASE_URL ?>/assets/icons/logo.svg" alt="" class="w-11 h-11">
+          <div>
+            <p class="auth-brand-name">IMS</p>
+            <p class="eyebrow mt-1">Inventory System</p>
+          </div>
+        </div>
+
+        <h1 class="auth-title">Log in</h1>
+        <p class="auth-subtitle">Sign in with your work account to continue.</p>
+
+        <?php
+          $error = $_GET['error'] ?? '';
+          $messages = [
+              'invalid' => 'Invalid email or password.',
+              'inactive' => 'Your account has been deactivated.',
+              'server' => 'Server error. Please try again later.',
+              'locked' => 'Too many failed attempts. Please wait a moment and try again.',
+          ];
+          if ($error && isset($messages[$error])): ?>
+            <div class="auth-error mt-6">
+              <?= icon('alert', 'w-4 h-4 shrink-0 mt-0.5') ?>
+              <p><?= e($messages[$error]) ?></p>
             </div>
+          <?php endif; ?>
+
+        <form class="mt-7" action="<?= BASE_URL ?>/auth/login.php" method="post">
+          <!-- Fields are placeholder-only per the minimal styling, so each
+               carries an aria-label to keep an accessible name. -->
+          <input type="email" name="email" required class="auth-input"
+                 placeholder="Email" aria-label="Email">
+
+          <input type="password" name="password" required class="auth-input mt-4"
+                 placeholder="Password" aria-label="Password">
+
+          <label class="auth-check mt-5">
+            <input type="checkbox" name="remember" class="w-3.5 h-3.5 rounded accent-tag-amber">
+            Keep me signed in
+          </label>
+
+          <button type="submit" class="auth-submit mt-6">Sign in</button>
+
+          <div class="text-right mt-4">
+            <button type="button" onclick="openForgotPasswordModal()" class="auth-forgot">Forgot your password?</button>
           </div>
-        <?php endif; ?>
-
-      <form class="px-7 pb-7 pt-5 space-y-4" action="<?= BASE_URL ?>/auth/login.php" method="post">
-        <div>
-          <label class="field-label">Email <span class="required-marker">*</span></label>
-          <input type="email" name="email" required class="field-input" placeholder="you@ims.local">
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <label class="field-label !mb-0">Password <span class="required-marker">*</span></label>
-            <button type="button" onclick="openForgotPasswordModal()" class="text-[11px] text-tag-amber hover:underline">Forgot?</button>
-          </div>
-          <input type="password" name="password" required class="field-input" placeholder="••••••••">
-        </div>
-
-        <label class="flex items-center gap-2 text-xs text-ink-muted">
-          <input type="checkbox" name="remember" class="w-3.5 h-3.5 rounded accent-tag-amber bg-base-deep border-border-light">
-          Keep me signed in
-        </label>
-
-        <button type="submit" class="btn-primary w-full !py-3 mt-2">
-          <?= icon('lock', 'w-4 h-4') ?>
-          Sign in
-        </button>
-      </form>
+        </form>
+      </div>
     </div>
 
     <p class="text-center text-[11px] text-ink-dim mt-6">Access is limited to authorized personnel.</p>
@@ -110,6 +100,18 @@ $pageTitle = 'Sign In';
       document.getElementById('forgot-password-modal').classList.add('hidden');
     }
   </script>
+
+  <!-- three.js is self-hosted rather than loaded from a CDN so the login
+       page keeps working on an isolated network. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "<?= BASE_URL ?>/assets/vendor/three.module.min.js",
+        "three/addons/utils/GeometryUtils.js": "<?= BASE_URL ?>/assets/vendor/GeometryUtils.js"
+      }
+    }
+  </script>
+  <script type="module" src="<?= BASE_URL ?>/scripts/login-3d.js"></script>
 
 </body>
 </html>

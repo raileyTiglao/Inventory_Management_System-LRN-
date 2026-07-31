@@ -320,6 +320,55 @@
     height: 280px;
   }
 
+  /* --- Auth split card ---------------------------------------------------
+     Two-panel sign-in layout: an inset visual panel (the three.js mount)
+     beside a minimal, pill-field form. Deliberately drops the bin-tag
+     chrome (perforation stripe, notch, mono field labels) for a cleaner
+     first impression; every colour still comes from the theme tokens so
+     the page tracks the light/dark toggle like the rest of the app. */
+  .auth-card {
+    @apply w-full flex flex-col md:flex-row md:min-h-[620px] gap-3 p-3 bg-card border border-border rounded-[24px];
+    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.22);
+  }
+  /* Reserved entirely for the three.js animation — no text of its own, and
+     dropped on narrow viewports rather than stacked above the form. */
+  .auth-visual {
+    @apply relative hidden md:block md:w-[45%] shrink-0 overflow-hidden rounded-[18px] bg-base-deep;
+  }
+  .auth-visual-canvas {
+    @apply absolute inset-0 z-0;
+  }
+  .auth-brand {
+    @apply flex items-center gap-3 mb-9;
+  }
+  .auth-brand-name {
+    @apply font-display font-semibold text-2xl leading-none text-ink;
+  }
+  .auth-form-side {
+    @apply flex-1 min-w-0 flex flex-col justify-center px-3 py-8 md:px-12 md:py-12;
+  }
+  .auth-title {
+    @apply font-display text-[2rem] leading-tight font-semibold text-ink;
+  }
+  .auth-subtitle {
+    @apply mt-2 text-sm text-ink-muted;
+  }
+  .auth-input {
+    @apply w-full h-14 px-6 rounded-full border border-border bg-transparent text-sm text-ink placeholder:text-ink-dim focus:outline-none focus:border-tag-amber focus:ring-2 focus:ring-tag-amber/20 transition-colors;
+  }
+  .auth-check {
+    @apply flex items-center gap-2.5 text-[13px] text-ink-muted;
+  }
+  .auth-submit {
+    @apply w-full h-14 rounded-full bg-tag-amber text-ink-onamber text-[13px] font-semibold uppercase tracking-[0.12em] hover:bg-tag-amberdark transition-colors;
+  }
+  .auth-forgot {
+    @apply text-[13px] font-medium text-ink hover:text-tag-amber hover:underline transition-colors;
+  }
+  .auth-error {
+    @apply flex items-start gap-2 p-3.5 rounded-2xl bg-stock-out/10 border border-stock-out/30 text-sm text-stock-out;
+  }
+
   /* Toolbar search field */
   .search-wrap {
     @apply relative;

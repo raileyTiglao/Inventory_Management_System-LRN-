@@ -1,5 +1,7 @@
 node_modules/
-vendor/
+# Root-anchored: this is for a Composer vendor dir, and an unanchored
+# `vendor/` would also swallow assets/vendor/ (the self-hosted three.js build).
+/vendor/
 
 # Local test/debug scratch files
 test*.php
