@@ -17,13 +17,13 @@ require_once __DIR__ . '/../connection/db.php';
 require_once __DIR__ . '/../auth/rbac.php';
 require_once __DIR__ . '/../utils/api.php';
 
-require_login();
+require_login_json();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $db = Connection::get_connecton();
 
 if ($method === 'GET') {
-    require_permission('Inventory', 'view');
+    require_permission_json('Inventory', 'view');
 
     $limit = (int)($_GET['limit'] ?? 50);
     $offset = (int)($_GET['offset'] ?? 0);
@@ -79,7 +79,7 @@ if ($method !== 'POST') {
     json_error('Method not allowed', 405);
 }
 
-require_permission('Inventory', 'edit');
+require_permission_json('Inventory', 'edit');
 
 $data = json_decode(file_get_contents('php://input'), true) ?? [];
 

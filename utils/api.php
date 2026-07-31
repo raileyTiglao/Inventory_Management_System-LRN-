@@ -27,3 +27,18 @@ function json_success($data = null, string $message = '', int $status = 200): vo
 {
     json_response(true, $data, $message, $status);
 }
+
+/**
+ * The IIS site in front of this app only forwards GET/HEAD/OPTIONS/TRACE
+ * to PHP — PUT and DELETE 405 at the IIS layer before reaching here.
+ * Frontend fetch() calls send those as POST with an X-HTTP-Method-Override
+ * header instead; this recovers the verb the request actually intends.
+ */
+function get_http_method(): string
+{
+    $method = $_SERVER['REQUEST_METHOD'];
+    if ($method === 'POST' && !empty($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+        $method = strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+    }
+    return $method;
+}

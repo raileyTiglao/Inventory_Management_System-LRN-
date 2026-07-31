@@ -428,8 +428,8 @@ $canDelete = has_permission('Inventory', 'delete');
       if (id) {
         payload.id = Number(id);
         res = await fetch(`${BASE_URL}/api/inventory.php`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-HTTP-Method-Override': 'PUT' },
           body: JSON.stringify(payload),
         });
       } else {
@@ -463,8 +463,8 @@ $canDelete = has_permission('Inventory', 'delete');
   async function setItemStatus(id, status) {
     try {
       const res = await fetch(`${BASE_URL}/api/inventory.php`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-HTTP-Method-Override': 'PUT' },
         body: JSON.stringify({ id, status }),
       });
       const json = await res.json();

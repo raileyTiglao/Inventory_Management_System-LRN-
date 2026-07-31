@@ -17,14 +17,14 @@ require_once __DIR__ . '/../connection/db.php';
 require_once __DIR__ . '/../auth/rbac.php';
 require_once __DIR__ . '/../utils/api.php';
 
-require_login();
+require_login_json();
 
-$method = $_SERVER['REQUEST_METHOD'];
+$method = get_http_method();
 $db = Connection::get_connecton();
 
 try {
     if ($method === 'GET') {
-        require_permission('Inventory', 'view');
+        require_permission_json('Inventory', 'view');
 
         if (isset($_GET['id'])) {
             $id = (int)$_GET['id'];
@@ -101,7 +101,7 @@ try {
     }
 
     elseif ($method === 'POST') {
-        require_permission('Inventory', 'create');
+        require_permission_json('Inventory', 'create');
 
         $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
@@ -168,7 +168,7 @@ try {
     }
 
     elseif ($method === 'PUT') {
-        require_permission('Inventory', 'edit');
+        require_permission_json('Inventory', 'edit');
 
         $data = json_decode(file_get_contents('php://input'), true);
 
@@ -228,7 +228,7 @@ try {
     }
 
     elseif ($method === 'DELETE') {
-        require_permission('Inventory', 'delete');
+        require_permission_json('Inventory', 'delete');
 
         $id = (int)($_GET['id'] ?? 0);
 

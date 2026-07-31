@@ -222,8 +222,8 @@
 
     try {
       const res = await fetch(BASE_URL + '/api/account.php', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-HTTP-Method-Override': 'PUT' },
         body: JSON.stringify(payload),
       });
       const json = await res.json();
@@ -245,7 +245,6 @@
 
       successEl.textContent = 'Account updated successfully.';
       successEl.classList.remove('hidden');
-      if (typeof showToast === 'function') showToast('Account updated successfully.', 'success');
     } catch (err) {
       errorEl.textContent = 'Could not reach the server. Please try again.';
       errorEl.classList.remove('hidden');

@@ -16,6 +16,21 @@ function require_login(): void
 }
 
 /**
+ * API-route equivalent of require_login() — a redirect makes no sense for a
+ * fetch() call (the browser just follows it and hands back the login page's
+ * HTML, which json.() then fails to parse as JSON, surfacing as a misleading
+ * "could not reach the server" error instead of "your session expired").
+ * Callers must have already loaded utils/api.php (every api/*.php does,
+ * before calling this).
+ */
+function require_login_json(): void
+{
+    if (!is_logged_in()) {
+        json_error('Your session has expired. Please sign in again.', 401);
+    }
+}
+
+/**
  * Deny all accounts access to User and Perms, except admin
  */
 const ADMIN_ROLE_NAME = 'Administrator';
@@ -112,5 +127,15 @@ function require_permission(string $module, string $action): void
         http_response_code(403);
         header('Location: ' . BASE_URL . '/pages/403.php');
         exit;
+    }
+}
+
+/** API-route equivalent of require_permission() — see require_login_json(). */
+function require_permission_json(string $module, string $action): void
+{
+    require_login_json();
+
+    if (!has_permission($module, $action)) {
+        json_error('You do not have permission to perform this action.', 403);
     }
 }

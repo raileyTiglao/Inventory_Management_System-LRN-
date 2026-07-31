@@ -338,8 +338,8 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
       if (id) {
         payload.id = Number(id);
         res = await fetch(`${BASE_URL}/api/users.php`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-HTTP-Method-Override': 'PUT' },
           body: JSON.stringify(payload),
         });
       } else {
@@ -388,7 +388,10 @@ $roles = Connection::get_connecton()->query('SELECT role_id, role_name FROM dbo.
     if (id == null) return;
 
     try {
-      const res = await fetch(`${BASE_URL}/api/users.php?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`${BASE_URL}/api/users.php?id=${id}`, {
+        method: 'POST',
+        headers: { 'X-HTTP-Method-Override': 'DELETE' },
+      });
       const json = await res.json();
       if (!json.success) {
         showToast(json.message || 'Could not delete user.', 'error');

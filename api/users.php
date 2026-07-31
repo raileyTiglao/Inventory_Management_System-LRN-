@@ -17,15 +17,15 @@ require_once __DIR__ . '/../connection/db.php';
 require_once __DIR__ . '/../auth/rbac.php';
 require_once __DIR__ . '/../utils/api.php';
 
-require_login();
+require_login_json();
 
-$method = $_SERVER['REQUEST_METHOD'];
+$method = get_http_method();
 $db = Connection::get_connecton();
 
 try {
     if ($method === 'GET') {
         // List all users or get single user
-        require_permission('Users', 'view');
+        require_permission_json('Users', 'view');
 
         if (isset($_GET['id'])) {
             $id = (int)$_GET['id'];
@@ -94,7 +94,7 @@ try {
     }
 
     elseif ($method === 'POST') {
-        require_permission('Users', 'create');
+        require_permission_json('Users', 'create');
 
         $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
@@ -149,7 +149,7 @@ try {
     }
 
     elseif ($method === 'PUT') {
-        require_permission('Users', 'edit');
+        require_permission_json('Users', 'edit');
 
         $data = json_decode(file_get_contents('php://input'), true);
 
@@ -210,7 +210,7 @@ try {
     }
 
     elseif ($method === 'DELETE') {
-        require_permission('Users', 'delete');
+        require_permission_json('Users', 'delete');
 
         $id = (int)($_GET['id'] ?? 0);
 
