@@ -1,17 +1,39 @@
 (function () {
   var THEME_KEY = 'ims-theme';
-  var toggleBtn = document.getElementById('theme-toggle-btn');
-  var lightIcon = document.getElementById('theme-toggle-icon-light');
-  var darkIcon = document.getElementById('theme-toggle-icon-dark');
+  var btn = document.getElementById('user-menu-btn');
+  var panel = document.getElementById('user-menu-panel');
+  var themeBtn = document.getElementById('user-menu-theme-btn');
+  var lightIcon = document.getElementById('user-menu-theme-icon-light');
+  var darkIcon = document.getElementById('user-menu-theme-icon-dark');
+  var themeLabel = document.getElementById('user-menu-theme-label');
+  var accountBtn = document.getElementById('user-menu-account-btn');
+  var signoutBtn = document.getElementById('user-menu-signout-btn');
 
   function reflectTheme(theme) {
-    lightIcon.classList.toggle('hidden', theme === 'dark');
-    darkIcon.classList.toggle('hidden', theme !== 'dark');
+    var isDark = theme === 'dark';
+    lightIcon.classList.toggle('hidden', isDark);
+    darkIcon.classList.toggle('hidden', !isDark);
+    themeLabel.textContent = isDark ? 'Light Mode' : 'Dark Mode';
   }
 
   reflectTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
 
-  toggleBtn.addEventListener('click', function () {
+  function closeMenu() {
+    panel.classList.add('hidden');
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    panel.classList.toggle('hidden');
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!panel.classList.contains('hidden') && !panel.contains(e.target) && e.target !== btn) {
+      closeMenu();
+    }
+  });
+
+  themeBtn.addEventListener('click', function () {
     var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     var next = isDark ? 'light' : 'dark';
     if (next === 'dark') {
@@ -21,6 +43,17 @@
     }
     localStorage.setItem(THEME_KEY, next);
     reflectTheme(next);
+    closeMenu();
+  });
+
+  accountBtn.addEventListener('click', function () {
+    closeMenu();
+    if (typeof openAccountModal === 'function') openAccountModal();
+  });
+
+  signoutBtn.addEventListener('click', function () {
+    closeMenu();
+    if (typeof openSignOutModal === 'function') openSignOutModal();
   });
 })();
 

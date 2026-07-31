@@ -1,0 +1,2 @@
+# BASE_URL is defined in config.php — keep this path in sync with it.
+ErrorDocument 404 /ims/pages/404.php

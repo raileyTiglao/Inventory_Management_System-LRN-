@@ -14,11 +14,6 @@
   </div>
 
   <div class="flex items-center gap-4">
-    <button type="button" id="theme-toggle-btn" class="w-9 h-9 flex items-center justify-center rounded-tag border border-border hover:border-tag-amber/50 text-ink-muted hover:text-tag-amber transition-colors" title="Toggle theme">
-      <span id="theme-toggle-icon-light"><?= icon('moon', 'w-[18px] h-[18px]') ?></span>
-      <span id="theme-toggle-icon-dark" class="hidden"><?= icon('sun', 'w-[18px] h-[18px]') ?></span>
-    </button>
-
     <div class="relative">
       <button type="button" id="notif-bell-btn" class="relative w-9 h-9 flex items-center justify-center rounded-tag border border-border hover:border-tag-amber/50 text-ink-muted hover:text-tag-amber transition-colors">
         <?= icon('bell', 'w-[18px] h-[18px]') ?>
@@ -35,15 +30,39 @@
       </div>
     </div>
 
-    <button type="button" onclick="openAccountModal()" class="flex items-center gap-2.5 pl-3 pr-3 py-1.5 -my-1.5 rounded-tag border-l border-border transition-colors hover:bg-overlay/10 hover:border-tag-amber/50" title="Account settings">
-      <div id="topbar-user-initials" class="w-8 h-8 rounded-tag bg-tag-amber/15 border border-tag-amber/30 flex items-center justify-center font-mono text-xs text-tag-amber">
-        <?= e($user['initials'] ?? '??') ?>
+    <div class="relative">
+      <button type="button" id="user-menu-btn" class="flex items-center gap-2.5 pl-3 pr-3 py-1.5 -my-1.5 rounded-tag border-l border-border transition-colors hover:bg-overlay/10 hover:border-tag-amber/50" title="Account menu">
+        <div id="topbar-user-initials" class="w-8 h-8 rounded-tag bg-tag-amber/15 border border-tag-amber/30 flex items-center justify-center font-mono text-xs text-tag-amber">
+          <?= e($user['initials'] ?? '??') ?>
+        </div>
+        <div class="hidden sm:block leading-tight text-left">
+          <p id="topbar-user-name" class="text-sm text-ink"><?= e($user['name'] ?? 'User') ?></p>
+          <p class="text-[11px] text-ink-dim"><?= e($user['role'] ?? 'Role') ?></p>
+        </div>
+      </button>
+
+      <div id="user-menu-panel" class="notif-panel hidden bin-tag">
+        <div class="panel-header">
+          <p class="eyebrow">Account</p>
+        </div>
+        <div class="py-1.5">
+          <button type="button" id="user-menu-theme-btn" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-muted hover:bg-overlay/10 hover:text-ink transition-colors">
+            <span id="user-menu-theme-icon-light"><?= icon('moon', 'w-4 h-4') ?></span>
+            <span id="user-menu-theme-icon-dark" class="hidden"><?= icon('sun', 'w-4 h-4') ?></span>
+            <span id="user-menu-theme-label">Dark Mode</span>
+          </button>
+          <button type="button" id="user-menu-account-btn" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink-muted hover:bg-overlay/10 hover:text-ink transition-colors">
+            <?= icon('users', 'w-4 h-4') ?>
+            Edit Account
+          </button>
+          <div class="border-t border-border my-1.5"></div>
+          <button type="button" id="user-menu-signout-btn" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-stock-out/80 hover:text-stock-out hover:bg-stock-out/10 transition-colors">
+            <?= icon('logout', 'w-4 h-4') ?>
+            Sign out
+          </button>
+        </div>
       </div>
-      <div class="hidden sm:block leading-tight text-left">
-        <p id="topbar-user-name" class="text-sm text-ink"><?= e($user['name'] ?? 'User') ?></p>
-        <p class="text-[11px] text-ink-dim"><?= e($user['role'] ?? 'Role') ?></p>
-      </div>
-    </button>
+    </div>
   </div>
 </header>
 
