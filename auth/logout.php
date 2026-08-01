@@ -5,5 +5,5 @@ require_once __DIR__ . '/session.php';
 $_SESSION = [];
 session_destroy();
 
-header('Location: ' . BASE_URL . '/pages/login/index.php');
+header('Location: ' . url('login'));
 exit;

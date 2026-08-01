@@ -39,11 +39,11 @@ if ($sidebarCanViewInventory) {
       <div data-nav-group>
         <p class="eyebrow px-3 mb-2 sidebar-label">Overview</p>
         <div class="space-y-1">
-          <a href="<?= BASE_URL ?>/pages/dashboard/index.php" class="sidebar-link <?= is_active('dashboard') ?>">
+          <a href="<?= url('dashboard') ?>" class="sidebar-link <?= is_active('dashboard') ?>">
             <?= icon('grid', 'w-[18px] h-[18px] shrink-0') ?>
             <span class="sidebar-label">Dashboard</span>
           </a>
-          <a href="<?= BASE_URL ?>/pages/inventory/index.php" class="sidebar-link <?= is_active('inventory') ?>">
+          <a href="<?= url('inventory') ?>" class="sidebar-link <?= is_active('inventory') ?>">
             <span class="relative shrink-0">
               <?= icon('package', 'w-[18px] h-[18px]') ?>
               <span id="sidebar-low-stock-dot" class="sidebar-collapsed-dot <?= $sidebarLowStockCount > 0 ? '' : 'hidden' ?>" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"></span>
@@ -51,7 +51,7 @@ if ($sidebarCanViewInventory) {
             <span class="sidebar-label flex-1">Inventory</span>
             <span id="sidebar-low-stock-badge" class="sidebar-badge sidebar-label <?= $sidebarLowStockCount > 0 ? '' : 'hidden' ?>" title="<?= $sidebarLowStockCount ?> item(s) at or below reorder level"><?= $sidebarLowStockCount ?></span>
           </a>
-          <a href="<?= BASE_URL ?>/pages/activity-log/index.php" class="sidebar-link <?= is_active('activity-log') ?>">
+          <a href="<?= url('activity-log') ?>" class="sidebar-link <?= is_active('activity-log') ?>">
             <?= icon('clock', 'w-[18px] h-[18px] shrink-0') ?>
             <span class="sidebar-label">Activity Log</span>
           </a>
@@ -61,12 +61,12 @@ if ($sidebarCanViewInventory) {
       <div data-nav-group>
         <p class="eyebrow px-3 mb-2 sidebar-label">Access Control</p>
         <div class="space-y-1">
-          <a href="<?= BASE_URL ?>/pages/users/index.php" class="sidebar-link <?= is_active('users') ?>">
+          <a href="<?= url('users') ?>" class="sidebar-link <?= is_active('users') ?>">
             <?= icon('users', 'w-[18px] h-[18px] shrink-0') ?>
             <span class="sidebar-label">Users</span>
           </a>
           <?php if (is_admin()): ?>
-            <a href="<?= BASE_URL ?>/pages/roles/index.php" class="sidebar-link <?= is_active('roles') ?>">
+            <a href="<?= url('roles') ?>" class="sidebar-link <?= is_active('roles') ?>">
               <?= icon('shield', 'w-[18px] h-[18px] shrink-0') ?>
               <span class="sidebar-label">Roles &amp; Permissions</span>
             </a>
@@ -107,7 +107,7 @@ if ($sidebarCanViewInventory) {
       <p class="text-sm text-ink-muted">You'll need to sign in again to access the system.</p>
       <div class="modal-footer">
         <button type="button" onclick="closeSignOutModal()" class="btn-secondary">Cancel</button>
-        <a href="<?= BASE_URL ?>/auth/logout.php" class="btn-danger">Sign out</a>
+        <a href="<?= url('logout') ?>" class="btn-danger">Sign out</a>
       </div>
     </div>
   </div>

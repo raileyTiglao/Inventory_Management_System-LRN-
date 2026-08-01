@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/../../auth/rbac.php';
 
+ensure_routed('inventory');
 require_login();
 require_permission('Inventory', 'view');
 
@@ -38,7 +39,7 @@ $canDelete = has_permission('Inventory', 'delete');
     </div>
 
     <!-- Stat cards -->
-    <div id="inventory-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div id="inventory-stats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       <div class="bin-tag stat-card">
         <p class="stat-code">INV-001</p>
         <p class="stat-value" id="stat-total-skus">—</p>

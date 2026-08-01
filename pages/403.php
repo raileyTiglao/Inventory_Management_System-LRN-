@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../bootstrap.php';
 require_once __DIR__ . '/../auth/session.php';
 
+ensure_routed('403');
+
 // The guards redirect here, so the redirect itself is a 302 — set the real
 // status on the page the browser actually lands on.
 http_response_code(403);
@@ -49,7 +51,7 @@ $user = logged_in_user();
 
         <div class="error-actions">
           <?php if ($user): ?>
-            <a href="<?= BASE_URL ?>/pages/dashboard/index.php" class="btn-primary">
+            <a href="<?= url('dashboard') ?>" class="btn-primary">
               <?= icon('grid', 'w-4 h-4') ?>
               Back to Dashboard
             </a>
@@ -58,7 +60,7 @@ $user = logged_in_user();
               Go back
             </button>
           <?php else: ?>
-            <a href="<?= BASE_URL ?>/pages/login/index.php" class="btn-primary">
+            <a href="<?= url('login') ?>" class="btn-primary">
               <?= icon('lock', 'w-4 h-4') ?>
               Sign in
             </a>

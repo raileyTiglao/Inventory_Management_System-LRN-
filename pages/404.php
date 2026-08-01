@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../bootstrap.php';
 
+ensure_routed('404');
+
 // Apache's ErrorDocument redispatches here internally, so the response is
 // still a 200 unless set explicitly — the browser needs the real status.
 http_response_code(404);
@@ -46,7 +48,7 @@ $pageTitle = 'Page Not Found';
         </p>
 
         <div class="error-actions">
-          <a href="<?= BASE_URL ?>/pages/login/index.php" class="btn-primary">
+          <a href="<?= url('login') ?>" class="btn-primary">
             <?= icon('lock', 'w-4 h-4') ?>
             Go to Sign In
           </a>

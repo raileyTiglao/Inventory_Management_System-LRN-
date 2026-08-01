@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/../../bootstrap.php';
+
+ensure_routed('login');
+
 $pageTitle = 'Sign In';
 ?>
 <!DOCTYPE html>
@@ -48,7 +51,7 @@ $pageTitle = 'Sign In';
             </div>
           <?php endif; ?>
 
-        <form class="mt-7" action="<?= BASE_URL ?>/auth/login.php" method="post">
+        <form class="mt-7" action="<?= url('login') ?>" method="post">
           <!-- Fields are placeholder-only per the minimal styling, so each
                carries an aria-label to keep an accessible name. -->
           <input type="email" name="email" required class="auth-input"

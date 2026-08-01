@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/../../auth/rbac.php';
 
+ensure_routed('dashboard');
 require_login();
 
 $activePage = 'dashboard';
@@ -110,7 +111,7 @@ $trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'ou
   <main class="flex-1 p-6 space-y-6">
 
     <!-- Stat cards: signature "bin tag" treatment -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       <?php foreach ($stats as $s): ?>
         <div class="bin-tag stat-card">
           <div class="flex items-start justify-between">
@@ -125,16 +126,16 @@ $trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'ou
       <?php endforeach; ?>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
       <!-- Recent activity -->
-      <div class="lg:col-span-2 bin-tag">
+      <div class="xl:col-span-2 bin-tag">
         <div class="panel-header">
           <div>
             <p class="eyebrow">Ledger</p>
             <h2 class="font-display font-semibold text-ink">Recent Activity</h2>
           </div>
-          <a href="<?= BASE_URL ?>/pages/activity-log/index.php" class="text-xs text-tag-amber hover:underline">View full log</a>
+          <a href="<?= url('activity-log') ?>" class="text-xs text-tag-amber hover:underline">View full log</a>
         </div>
         <div class="divide-y divide-border/60">
           <?php if (empty($activity)): ?>

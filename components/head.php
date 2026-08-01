@@ -3,7 +3,6 @@
 <title><?= e($pageTitle ?? 'IMS') ?> · IMS</title>
 <link rel="icon" href="<?= BASE_URL ?>/assets/icons/logo.svg" type="image/svg+xml">
 <script>
-  // Set the theme before first paint to avoid a flash of the wrong palette.
   (function () {
     var saved = localStorage.getItem('ims-theme');
     if (saved === 'dark') {

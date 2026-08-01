@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/../../auth/rbac.php';
 
+ensure_routed('users');
 require_login();
 require_permission('Users', 'view');
 

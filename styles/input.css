@@ -429,3 +429,67 @@
     margin-top: 1.5rem;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Touch-device sizing (tablets).
+
+   `pointer: coarse` matches finger/stylus input only, so everything here
+   applies to tablets while mouse-driven desktops keep their denser layout —
+   there's no trade-off between the two.
+
+   Deliberately OUTSIDE @layer components: these rules have to beat Tailwind
+   utilities (w-8, py-2.5, w-3.5) sitting on the same elements. Unlayered CSS
+   placed after the @tailwind directives is emitted last, so it wins on source
+   order — see the .sidebar-collapsed-dot note above for the failure mode when
+   a components-layer rule tries to override a utility.
+   --------------------------------------------------------------------------- */
+@media (pointer: coarse) {
+
+  /* Dense controls — table row actions and pagination — keep their visual
+     size on purpose: growing them to 44px would widen the actions column by
+     ~48px, and the data tables are already the tightest thing on a tablet in
+     portrait. A transparent pseudo-element extends the tap area beyond the
+     visible box instead, costing zero layout width.
+
+     Horizontal growth is capped at 3px per side so neighbouring targets meet
+     exactly at the 6px (gap-1.5) separator instead of overlapping — overlap
+     would put the right button's hit area on top of the left one's edge.
+     Vertical growth is more generous, since row padding leaves room and the
+     neighbours there are separate rows. Net target: ~38x48px, up from 32x32. */
+  .icon-btn,
+  .pagination-btn,
+  .pagination-btn-active {
+    position: relative;
+  }
+  .icon-btn::after,
+  .pagination-btn::after,
+  .pagination-btn-active::after {
+    content: "";
+    position: absolute;
+    inset: -0.5rem -0.1875rem;
+  }
+
+  /* Standalone controls have room to reach the 44px minimum properly. */
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .field-input,
+  .search-input,
+  .sidebar-link {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  /* 14px (w-3.5) is well under a usable tap target. Worst in the roles
+     permission matrix, which is a dense grid of nothing but checkboxes. */
+  input[type="checkbox"] {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  /* The row itself is the main tap surface on the data pages. */
+  .data-table tbody td {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}

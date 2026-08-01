@@ -10,7 +10,7 @@ require_once __DIR__ . '/../connection/db.php';
 function require_login(): void
 {
     if (!is_logged_in()) {
-        header('Location: ' . BASE_URL . '/pages/login/index.php');
+        header('Location: ' . url('login'));
         exit;
     }
 }
@@ -76,7 +76,7 @@ function require_admin(): void
 
     if (!is_admin()) {
         http_response_code(403);
-        header('Location: ' . BASE_URL . '/pages/403.php');
+        header('Location: ' . url('403'));
         exit;
     }
 }
@@ -125,7 +125,7 @@ function require_permission(string $module, string $action): void
 
     if (!has_permission($module, $action)) {
         http_response_code(403);
-        header('Location: ' . BASE_URL . '/pages/403.php');
+        header('Location: ' . url('403'));
         exit;
     }
 }

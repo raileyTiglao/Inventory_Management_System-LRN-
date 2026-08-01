@@ -1,2 +1,26 @@
-# BASE_URL is defined in config.php — keep this path in sync with it.
-ErrorDocument 404 /ims/pages/404.php
+# Apache (local XAMPP) front-controller rules. IIS never reads this file, so
+# it is safe to deploy as-is; the IIS equivalent is web.config.example, which
+# ships inactive on purpose (see the notes in it).
+#
+# Nothing below is required: with CLEAN_URLS = false in config.php every
+# generated link is the index.php?page=... form. These rules only enable the
+# prettier /ims/inventory style on Apache.
+#
+# BASE_URL is defined in config.php; keep these paths in sync with it.
+
+ErrorDocument 404 /ims/404
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /ims/
+
+  # Real files (styles, scripts, assets, the vendored three.js build, and
+  # the api/*.php endpoints the frontend calls) are served as-is.
+  # Only -f, not -d: letting directories through would expose listings for
+  # /assets and friends, and every real route is a file anyway.
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+
+  # Everything else is a route — hand it to the front controller.
+  RewriteRule ^ index.php [L]
+</IfModule>

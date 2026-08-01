@@ -10,16 +10,49 @@
     collapsedIcon.classList.toggle('hidden', !collapsed);
   }
 
-  var startCollapsed = localStorage.getItem(STORAGE_KEY) === '1';
-  if (startCollapsed) {
-    sidebar.classList.add('sidebar-collapsed');
+  // Below this width the expanded sidebar costs more than it's worth: at
+  // 256px it eats a third of a tablet-portrait screen, leaving too little
+  // for the data tables. The icon rail is 72px, so collapsing buys back
+  // ~184px exactly where it's scarcest.
+  var narrowQuery = window.matchMedia('(max-width: 1279px)');
+
+  // The stored value is the *desktop* preference only — see the toggle
+  // handler for why a tablet-side toggle deliberately doesn't persist.
+  function desktopPreference() {
+    return localStorage.getItem(STORAGE_KEY) === '1';
   }
-  reflectToggleIcon(startCollapsed);
+
+  function applyCollapsed(collapsed) {
+    sidebar.classList.toggle('sidebar-collapsed', collapsed);
+    reflectToggleIcon(collapsed);
+  }
+
+  applyCollapsed(narrowQuery.matches ? true : desktopPreference());
+
+  function onWidthChange(e) {
+    // Re-assert on every crossing: collapsed while narrow, back to whatever
+    // the user chose once there's room for it again.
+    applyCollapsed(e.matches ? true : desktopPreference());
+  }
+
+  // addListener is the pre-Safari-14 spelling — still worth keeping for
+  // older iPads, which are exactly the devices this breakpoint targets.
+  if (narrowQuery.addEventListener) {
+    narrowQuery.addEventListener('change', onWidthChange);
+  } else if (narrowQuery.addListener) {
+    narrowQuery.addListener(onWidthChange);
+  }
 
   toggle.addEventListener('click', function () {
-    var collapsed = sidebar.classList.toggle('sidebar-collapsed');
-    localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0');
-    reflectToggleIcon(collapsed);
+    var collapsed = !sidebar.classList.contains('sidebar-collapsed');
+    applyCollapsed(collapsed);
+
+    // Only persist from a viewport wide enough to honour the choice. A
+    // tablet user expanding the sidebar once shouldn't force it open on
+    // the desktop they sign into later.
+    if (!narrowQuery.matches) {
+      localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0');
+    }
   });
 
   var searchInput = document.getElementById('sidebar-nav-search');
