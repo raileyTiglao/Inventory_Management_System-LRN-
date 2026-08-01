@@ -205,7 +205,7 @@ $trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'ou
               <?= icon('minus-circle', 'w-3.5 h-3.5 text-stock-out') ?> Issued
             </span>
           </div>
-          <button type="button" id="trend-table-toggle" class="text-xs text-tag-amber hover:underline">View as table</button>
+          <button type="button" onclick="openTrendTableModal()" class="text-xs text-tag-amber hover:underline">View as table</button>
         </div>
       </div>
 
@@ -237,8 +237,28 @@ $trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'ou
             <div id="trend-tooltip" class="hidden fixed z-50 bin-tag px-3 py-2 text-xs pointer-events-none"></div>
           <?php endif; ?>
         </div>
+      </div>
+    </div>
+  </main>
+</div>
 
-        <table id="trend-table" class="data-table hidden mt-2">
+<!-- Stock trend as a table. Lives in a modal so opening it leaves the chart
+     on screen rather than swapping it out. -->
+<div id="trend-table-modal" class="hidden flex modal-overlay">
+  <div class="bin-tag modal-panel">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Flow · Last 14 Days</p>
+        <h2 class="font-display font-semibold text-ink">Stock Trend</h2>
+      </div>
+      <button type="button" onclick="closeTrendTableModal()" class="icon-btn-muted">✕</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <!-- min-w-0 cancels .data-table's 720px floor: three narrow columns
+           don't need it, and it would force a scrollbar inside the panel.
+           max-h keeps all 14 rows scrollable instead of overflowing tall. -->
+      <div class="overflow-x-auto overflow-y-auto max-h-[60vh]">
+        <table class="data-table min-w-0">
           <thead>
             <tr>
               <th class="text-left">Date</th>
@@ -257,16 +277,17 @@ $trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'ou
           </tbody>
         </table>
       </div>
+      <div class="modal-footer">
+        <button type="button" onclick="closeTrendTableModal()" class="btn-primary">Close</button>
+      </div>
     </div>
-  </main>
+  </div>
 </div>
 
 <script>
 (function () {
   const chart = document.getElementById('trend-chart');
   const tooltip = document.getElementById('trend-tooltip');
-  const tableToggle = document.getElementById('trend-table-toggle');
-  const table = document.getElementById('trend-table');
 
   if (chart && tooltip) {
     chart.querySelectorAll('.trend-col').forEach((col) => {
@@ -297,16 +318,14 @@ $trendMax = max(array_merge(array_column($trend, 'in'), array_column($trend, 'ou
     });
   }
 
-  const chartWrap = document.getElementById('trend-chart-wrap');
-  if (tableToggle && table && chartWrap) {
-    tableToggle.addEventListener('click', () => {
-      const showingTable = !table.classList.contains('hidden');
-      table.classList.toggle('hidden', showingTable);
-      chartWrap.classList.toggle('hidden', !showingTable);
-      tableToggle.textContent = showingTable ? 'View as table' : 'View as chart';
-    });
-  }
 })();
+
+function openTrendTableModal() {
+  document.getElementById('trend-table-modal').classList.remove('hidden');
+}
+function closeTrendTableModal() {
+  document.getElementById('trend-table-modal').classList.add('hidden');
+}
 </script>
 
 </body>
