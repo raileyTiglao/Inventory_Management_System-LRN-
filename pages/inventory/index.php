@@ -136,6 +136,7 @@ $canDelete = has_permission('Inventory', 'delete');
 <?php include __DIR__ . '/../../components/inventory-modal.php'; ?>
 <?php include __DIR__ . '/../../components/stock-movement-modal.php'; ?>
 <?php include __DIR__ . '/../../components/archive-modal.php'; ?>
+<?php include __DIR__ . '/../../components/item-history-modal.php'; ?>
 
 <script>
   const BASE_URL = <?= json_encode(BASE_URL) ?>;
@@ -153,6 +154,14 @@ $canDelete = has_permission('Inventory', 'delete');
   function formatMoney(value) {
     const n = Number(value ?? 0);
     return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Matches the activity log's formatter so a timestamp reads the same on
+  // both pages. created_at is stored as UTC (GETUTCDATE), hence the 'Z'.
+  function formatDate(value) {
+    const d = new Date(String(value).replace(' ', 'T') + 'Z');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+      ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
 
   async function loadInventory() {
@@ -213,6 +222,9 @@ $canDelete = has_permission('Inventory', 'delete');
       }
 
       const actions = [];
+      // History is read-only, so it's offered for archived items too and
+      // needs no permission beyond the Inventory view this page already requires.
+      actions.push(`<button onclick="openItemHistoryModal(${item.sku_id})" class="icon-btn-muted" title="Movement history">${iconHistory()}</button>`);
       if (!archived) {
         if (CAN_EDIT) {
           actions.push(`<button onclick="openMoveModal(${item.sku_id}, 'in')" class="icon-btn-success" title="Receive stock">${iconStockIn()}</button>`);
@@ -349,6 +361,60 @@ $canDelete = has_permission('Inventory', 'delete');
   }
   function iconStockOut() {
     return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>';
+  }
+  function iconHistory() {
+    return '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  }
+
+  // ---- Item movement history ----
+
+  async function openItemHistoryModal(id) {
+    // Looked up from state rather than passed through the onclick: esc()
+    // turns an apostrophe into &#39;, which would show up literally in the
+    // heading for names like "Driver's kit".
+    const item = state.items.find(i => i.sku_id === id);
+    const tbody = document.getElementById('item-history-tbody');
+
+    document.getElementById('item-history-sku').textContent = item ? item.sku_code : id;
+    document.getElementById('item-history-name').textContent = item ? item.name : 'Item History';
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-ink-dim py-8">Loading…</td></tr>';
+    document.getElementById('item-history-modal').classList.remove('hidden');
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/stock_movements.php?sku_id=${id}&limit=100`);
+      const json = await res.json();
+
+      if (!json.success) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-stock-out py-8">${esc(json.message || 'Could not load history.')}</td></tr>`;
+        return;
+      }
+
+      const movements = json.data.movements || [];
+      if (movements.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-ink-dim py-8">No movements recorded for this item.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = movements.map(m => {
+        const isIn = m.movement_type === 'in';
+        const tone = isIn ? 'text-stock-in' : 'text-stock-out';
+        return `
+          <tr>
+            <td class="text-xs whitespace-nowrap">${esc(formatDate(m.created_at))}</td>
+            <td class="text-xs ${tone}">${isIn ? 'Received' : 'Issued'}</td>
+            <td class="text-right font-mono text-xs ${tone}">${isIn ? '+' : '-'}${esc(m.quantity)}</td>
+            <td class="text-right font-mono text-xs">${esc(m.balance_after)}</td>
+            <td class="font-mono text-xs text-ink-dim">${esc(m.reference_code || '—')}</td>
+            <td class="text-xs whitespace-nowrap">${esc(m.first_name + ' ' + m.last_name)}</td>
+          </tr>`;
+      }).join('');
+    } catch (err) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-stock-out py-8">Could not reach the server. Please try again.</td></tr>';
+    }
+  }
+
+  function closeItemHistoryModal() {
+    document.getElementById('item-history-modal').classList.add('hidden');
   }
 
   // ---- Modal handling ----

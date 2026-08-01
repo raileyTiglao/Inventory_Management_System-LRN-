@@ -29,10 +29,15 @@ if ($method === 'GET') {
     $offset = (int)($_GET['offset'] ?? 0);
     $search = trim($_GET['q'] ?? '');
     $type = $_GET['type'] ?? '';
+    $skuId = (int)($_GET['sku_id'] ?? 0);
 
     $where = [];
     $params = [];
 
+    if ($skuId > 0) {
+        $where[] = 'm.sku_id = ?';
+        $params[] = $skuId;
+    }
     if (in_array($type, ['in', 'out'], true)) {
         $where[] = 'm.movement_type = ?';
         $params[] = $type;
@@ -45,21 +50,48 @@ if ($method === 'GET') {
 
     $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
+    // Running stock level after each movement — only meaningful for a single
+    // item's ledger, so it's omitted from the mixed activity-log view.
+    //
+    // Worked out BACKWARDS from quantity_on_hand (subtracting every movement
+    // newer than the current row) rather than forwards from zero. Forwards
+    // only reconciles when an item's opening stock was written as an INITIAL
+    // movement, which items created before that behaviour existed don't have
+    // — for those, a forward total drifts by the unrecorded opening balance
+    // and can even read negative. quantity_on_hand is authoritative and can
+    // only change through this endpoint (see api/inventory.php's PUT), so
+    // walking back from it is correct for old and new items alike.
+    //
+    // Pagination-safe: window functions are evaluated after WHERE but before
+    // OFFSET/FETCH, so the frame spans the item's whole history instead of
+    // restarting on each page. The newest row has an empty frame, hence the
+    // ISNULL — its balance is simply the current quantity on hand.
+    $balanceSelect = '';
+    if ($skuId > 0) {
+        $balanceSelect = ",
+               i.quantity_on_hand - ISNULL(
+                   SUM(CASE WHEN m.movement_type = 'in' THEN m.quantity ELSE -m.quantity END)
+                       OVER (ORDER BY m.created_at DESC, m.movement_id DESC
+                             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING), 0) AS balance_after";
+    }
+
     $stmt = $db->prepare("
         SELECT m.movement_id, m.movement_type, m.quantity, m.reference_code, m.notes, m.created_at,
                i.sku_id, i.sku_code, i.name AS item_name,
                u.user_id, u.first_name, u.last_name,
-               COUNT(*) OVER() as total_count
+               COUNT(*) OVER() as total_count$balanceSelect
         FROM dbo.ims_stock_movements m
         JOIN dbo.ims_inventory i ON m.sku_id = i.sku_id
         JOIN dbo.ims_users u ON m.user_id = u.user_id
         $whereSql
-        ORDER BY m.created_at DESC
+        ORDER BY m.created_at DESC, m.movement_id DESC
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
     ");
     $paramIndex = 1;
     foreach ($params as $p) {
-        $stmt->bindValue($paramIndex++, $p, PDO::PARAM_STR);
+        // sku_id is an int; binding it as a string would force an implicit
+        // conversion on the indexed column.
+        $stmt->bindValue($paramIndex++, $p, is_int($p) ? PDO::PARAM_INT : PDO::PARAM_STR);
     }
     $stmt->bindValue($paramIndex++, $offset, PDO::PARAM_INT);
     $stmt->bindValue($paramIndex++, $limit, PDO::PARAM_INT);
