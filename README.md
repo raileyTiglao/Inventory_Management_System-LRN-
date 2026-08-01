@@ -6,7 +6,7 @@ on XAMPP with SQL Server.
 ## Stack
 - **Frontend:** HTML (PHP templating), Tailwind CSS
 - **Backend:** PHP REST API, PDO SQL Server driver
-- **Database:** SQL Server — tables use the `dbo.ims_<entity>` naming convention
+- **Database:** SQL Server 
 - **Deployment:** XAMPP (Apache + PHP)
 
 ## File structure
